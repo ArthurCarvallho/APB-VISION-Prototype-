@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APB Vision - Agendar Entrevista</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="navbar-layout">
+    <div class="header">
+        <div class="logo">APB <span class="logo-vision">Vision</span></div>
+        <nav class="navbar">
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/vagas">Vagas</a></li>
+                <li><a href="/candidatos_ranqueados" class="active">Candidatos</a></li>
+                <li><a href="#">Configurações</a></li>
+            </ul>
+        </nav>
+        <div class="user-info">
+            <img src="{{ url_for('static', filename='images/user_profile.jpg') }}" alt="Foto de perfil">
+            <span>Olá, Ana!</span>
+        </div>
+    </div>
+
+    <div class="main-content content-wrapper">
+        <a href="/detalhes_candidato" class="back-arrow"><i class="fas fa-arrow-left"></i></a>
+        <h2>Agendar entrevista com <span id="candidateNameInterview">Marcos Vinicius Mendes</span></h2>
+
+        <div class="container-central">
+            <div class="card-form-interview">
+                <form id="interviewForm">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="tipoEntrevista">Tipo de Entrevista</label>
+                            <select id="tipoEntrevista" name="tipoEntrevista" required>
+                                <option value="online">Online</option>
+                                <option value="presencial">Presencial</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="recrutador">Recrutador Responsável</label>
+                            <select id="recrutador" name="recrutador" required>
+                                <option value="ana">Ana</option>
+                                <option value="joao">João</option>
+                                <option value="maria">Maria</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="dataEntrevista">Data</label>
+                            <input type="date" id="dataEntrevista" name="dataEntrevista" value="2025-12-18" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="horaEntrevista">Hora</label>
+                            <input type="time" id="horaEntrevista" name="horaEntrevista" value="17:00" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions-bottom">
+                        <button type="button" class="btn btn-secondary" id="btnCancelarAgendamento">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="btnConfirmarAgendamento">Confirmar agendamento</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

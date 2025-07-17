@@ -1,0 +1,1278 @@
+/* Importação de fontes (ex: Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&display=swap');
+/* Use Playfair Display para títulos e Roboto para texto geral se desejar, ou ajuste conforme a fonte da imagem */
+
+:root {
+    --color-black: #000;
+    --color-white: #fff;
+    --color-light-gray: #E0E0E0; /* Exemplo de cinza claro */
+    --color-medium-gray: #A0A0A0; /* Exemplo de cinza médio */
+    --color-dark-gray: #333; /* Exemplo de cinza escuro */
+    --font-primary: 'Roboto', sans-serif;
+    --font-secondary: 'Playfair Display', serif; /* Para títulos mais elegantes, se aplicável */
+}
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    background-color: var(--color-light-gray); /* Fundo geral claro */
+    color: var(--color-dark-gray);
+    line-height: 1.6;
+}
+
+/* Layout geral */
+.header {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.logo {
+    font-size: 2.2em; /* Ajuste o tamanho da fonte para a logo */
+    font-weight: bold;
+    font-family: var(--font-secondary); /* Exemplo para um estilo mais "elegante" da logo */
+}
+
+.logo-vision {
+    font-weight: normal; /* "Vision" pode ter um peso de fonte diferente */
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.navbar a {
+    color: var(--color-white);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.navbar a:hover,
+.navbar a.active {
+    color: var(--color-medium-gray); /* Ou outra cor de destaque */
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-info img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-info span {
+    font-weight: bold;
+}
+
+.back-arrow {
+    font-size: 2em; /* Tamanho da seta */
+    color: var(--color-black); /* Cor da seta */
+    text-decoration: none;
+    margin-left: 20px;
+    display: block; /* Garante que ocupa a linha */
+    width: fit-content;
+    padding-top: 20px; /* Espaçamento do topo */
+}
+
+.main-content {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+h2, h3, h4 {
+    font-family: var(--font-secondary); /* Títulos com a fonte serifada */
+    font-weight: 700;
+    color: var(--color-dark-gray);
+    margin-bottom: 20px;
+}
+
+/* Elementos de Formulário e Botões */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-group input[type="email"],
+.input-group input[type="password"],
+.input-group input[type="text"],
+.input-group input[type="date"],
+.input-group input[type="time"],
+.input-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--color-medium-gray);
+    border-radius: 8px; /* Cantos mais suaves */
+    font-size: 1em;
+    background-color: var(--color-light-gray); /* Fundo dos inputs */
+}
+
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background-color: var(--color-black);
+    color: var(--color-white);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-dark-gray);
+}
+
+.btn-secondary {
+    background-color: var(--color-medium-gray);
+    color: var(--color-dark-gray);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-light-gray);
+}
+
+/* Estilos específicos da página de Login */
+.login-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--color-white); /* Fundo do login branco */
+}
+
+.container-central {
+    flex-grow: 1; /* Faz o container crescer e centralizar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.card-login {
+    background-color: var(--color-light-gray);
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 450px;
+    width: 100%;
+}
+
+.card-login h2 {
+    margin-top: 20px;
+    margin-bottom: 30px;
+    font-size: 1.8em;
+    color: var(--color-dark-gray);
+}
+
+.card-login .input-group {
+    text-align: left;
+}
+
+.card-login .btn-primary {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.links-login {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.links-login a {
+    color: var(--color-dark-gray);
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.links-login a:hover {
+    text-decoration: underline;
+}
+
+/* Ícones (Placeholder - você precisará de SVGs ou fontes de ícone reais) */
+.icon-search-lg {
+    width: 80px;
+    height: 80px;
+    background-color: var(--color-medium-gray); /* Cor para o círculo do ícone */
+    border-radius: 50%;
+    margin: 0 auto 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em; /* Tamanho do ícone */
+    color: var(--color-white);
+    /* Para o ícone de lupa: você pode usar um ícone de fonte como Font Awesome ou um SVG */
+    /* Exemplo com Font Awesome (precisa importar a lib): */
+    /* content: '\f002'; /* Código Unicode para a lupa */
+    /* font-family: 'Font Awesome 5 Free'; */
+    /* font-weight: 900; */
+}
+/* No momento, ele é apenas um círculo cinza. Para ser uma lupa, você precisaria de uma biblioteca de ícones ou SVG */
+
+
+/* Classes de Layout Comuns */
+.navbar-layout { /* Para páginas com a barra de navegação completa */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content-wrapper {
+    flex-grow: 1; /* O conteúdo principal preenche o espaço restante */
+}
+
+
+/* Adicionando ícone de seta para trás */
+.arrow-icon {
+    font-size: 2em;
+    color: var(--color-black);
+    text-decoration: none;
+    margin-left: 20px;
+    margin-top: 20px;
+    display: inline-block; /* Para que a seta e o título possam estar na mesma linha ou abaixo */
+}
+
+/* ... (Seu CSS existente) ... */
+
+/* Estilos específicos para o card de ação na dashboard */
+.card-action {
+    background-color: var(--color-light-gray);
+    padding: 50px 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 500px; /* Ajuste conforme o Figma */
+    width: 100%;
+    margin-top: -50px; /* Puxa um pouco para cima do centro */
+}
+
+.icon-card-action {
+    font-size: 5em; /* Tamanho grande para o ícone */
+    color: var(--color-dark-gray); /* Cor do ícone */
+    margin-bottom: 30px;
+    display: block; /* Garante que o ícone ocupa sua própria linha */
+}
+
+.card-action h2 {
+    font-size: 1.8em;
+    margin-bottom: 30px;
+    color: var(--color-dark-gray);
+}
+
+.card-action .btn-primary {
+    width: 80%; /* Botão um pouco mais largo */
+    padding: 15px;
+    font-size: 1.2em;
+}
+
+/* Centralização para containers como no login e dashboard */
+.container-central {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+/* ... (Seu CSS existente) ... */
+
+/* Estilos específicos da página de Upload de Currículos */
+.card-upload {
+    background-color: var(--color-light-gray);
+    padding: 30px 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 600px; /* Ajuste a largura conforme o Figma */
+    width: 100%;
+    margin-top: 20px; /* Espaço do título */
+    position: relative; /* Para posicionar o ícone de círculo */
+}
+
+.card-upload .icon-search-circle {
+    width: 80px;
+    height: 80px;
+    background-color: var(--color-black); /* Cor do círculo */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em; /* Tamanho da lupa */
+    color: var(--color-white);
+    margin: -70px auto 20px auto; /* Para posicionar sobre o card, ajuste conforme necessário */
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    /* Se estiver usando Font Awesome, adicione a classe do ícone aqui */
+    content: '\f002'; /* Unicode para a lupa */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+.card-upload .vaga-relacionada {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 10px 20px;
+    border-radius: 5px;
+    display: inline-block; /* Para o background ficar apenas no texto */
+    margin-bottom: 25px;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.drag-drop-area {
+    border: 2px dashed var(--color-medium-gray);
+    border-radius: 10px;
+    padding: 40px 20px;
+    margin-bottom: 30px;
+    text-align: center;
+    background-color: var(--color-white);
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.drag-drop-area.highlight {
+    border-color: var(--color-black);
+    background-color: #f0f0f0; /* Um cinza mais claro para quando estiver arrastando */
+}
+
+.drag-drop-area p {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    color: var(--color-dark-gray);
+}
+
+.icon-file {
+    font-size: 4em; /* Tamanho do ícone de arquivo */
+    color: var(--color-medium-gray);
+}
+
+.btn-select-file {
+    width: 80%; /* Botão mais largo */
+    padding: 15px;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+.file-types {
+    font-size: 0.9em;
+    color: var(--color-dark-gray);
+    margin-bottom: 30px;
+}
+
+.file-types strong {
+    font-weight: bold; /* Para destacar PDF e DOCX */
+}
+
+.upload-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Espaço entre os botões */
+    margin-top: 30px;
+}
+
+.upload-actions .btn {
+    flex: 1; /* Faz os botões ocuparem espaço igual */
+    padding: 15px;
+    font-size: 1.1em;
+}
+
+/* Seta de voltar para todas as páginas internas */
+.main-content > .back-arrow {
+    margin-top: 20px;
+    margin-left: 20px;
+    font-size: 2em;
+    color: var(--color-black);
+    text-decoration: none;
+    display: block; /* Garante que ele não se mistura com o h2 */
+    width: fit-content;
+}
+
+.main-content h2 {
+    text-align: center;
+    margin-top: -20px; /* Puxa o título um pouco para cima */
+    margin-bottom: 40px; /* Espaço abaixo do título */
+}
+
+/* Ajustes para o logo no header, para que "Vision" tenha outro estilo */
+.logo {
+    font-family: var(--font-secondary);
+    font-size: 2.2em;
+    font-weight: bold;
+    color: var(--color-white);
+}
+
+.logo .logo-vision {
+    font-family: var(--font-primary); /* Use a fonte sans-serif para "Vision" */
+    font-size: 0.8em; /* Levemente menor que APB */
+    font-weight: normal;
+    display: block; /* Para "Vision" ficar abaixo de "APB" se necessário */
+    line-height: 0.8; /* Ajuste para o espaçamento vertical */
+    margin-left: 5px; /* Para alinhar com APB */
+}
+
+/* Ajuste se quiser APB Vision na mesma linha */
+.logo {
+    display: flex;
+    align-items: baseline;
+    gap: 5px; /* Espaço entre APB e Vision */
+}
+.logo .logo-vision {
+    font-size: 0.7em; /* Pode ser menor */
+    font-weight: normal;
+    display: inline; /* Volta para a mesma linha */
+}
+/* ... (Seu CSS existente) ... */
+
+/* Estilos específicos da página de Processamento */
+.card-processing {
+    background-color: var(--color-light-gray);
+    padding: 50px 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 550px; /* Ajuste conforme o Figma */
+    width: 100%;
+    margin-top: 20px;
+}
+
+.spinner-icon {
+    font-size: 5em; /* Tamanho do ícone de carregamento */
+    color: var(--color-medium-gray);
+    margin-bottom: 40px;
+}
+
+.progress-bar-container {
+    width: 80%; /* Largura do contêiner da barra */
+    background-color: var(--color-medium-gray); /* Cor de fundo da barra vazia */
+    border-radius: 10px;
+    height: 15px; /* Altura da barra */
+    margin: 0 auto 30px auto; /* Centraliza e adiciona margem inferior */
+    overflow: hidden; /* Garante que o preenchimento fique dentro do raio */
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%; /* Começa vazia */
+    background-color: var(--color-black); /* Cor de preenchimento da barra */
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out; /* Animação suave para o preenchimento */
+}
+
+.card-processing p {
+    font-size: 1.1em;
+    color: var(--color-dark-gray);
+    margin-top: 20px;
+}
+/* ... (Seu CSS existente) ... */
+
+/* Estilos específicos da página de Candidatos Ranqueados */
+.main-content h2 {
+    text-align: left; /* Alinha o título à esquerda */
+    margin-left: 20px; /* Para alinhar com a seta */
+    margin-top: -10px; /* Ajuste para o espaçamento */
+    margin-bottom: 30px;
+    font-size: 1.8em;
+}
+
+.filter-sort-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 900px; /* Largura da área de filtro/ordenação */
+    margin: 0 auto 30px auto;
+    padding: 0 20px; /* Espaçamento interno */
+}
+
+.search-input {
+    flex-grow: 1; /* Ocupa o espaço disponível */
+    padding: 12px 15px;
+    border: 1px solid var(--color-medium-gray);
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: var(--color-light-gray);
+    margin-right: 20px;
+    max-width: 350px; /* Largura máxima para o campo de busca */
+}
+
+.sort-by {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1em;
+    color: var(--color-dark-gray);
+}
+
+.sort-select {
+    padding: 10px 15px;
+    border: 1px solid var(--color-medium-gray);
+    border-radius: 8px;
+    background-color: var(--color-light-gray);
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.candidate-list {
+    max-width: 900px;
+    margin: 0 auto 30px auto;
+    background-color: var(--color-white);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    overflow: hidden; /* Para cantos arredondados */
+}
+
+.candidate-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    border-bottom: 1px solid #eee; /* Linha divisória */
+}
+
+.candidate-item:last-child {
+    border-bottom: none; /* Remove a linha do último item */
+}
+
+.candidate-item:hover {
+    background-color: #f9f9f9; /* Leve destaque ao passar o mouse */
+}
+
+.candidate-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    flex-grow: 1; /* Ocupa mais espaço */
+    color: var(--color-dark-gray);
+}
+
+.candidate-score {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--color-black); /* Cor mais escura para a pontuação */
+    margin-right: 30px;
+    min-width: 60px; /* Garante que o % não quebre */
+    text-align: right;
+}
+
+.candidate-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.candidate-actions .btn-details {
+    background-color: var(--color-black); /* Botão "Ver detalhes" */
+    color: var(--color-white);
+    padding: 8px 15px;
+    font-size: 0.9em;
+    border-radius: 5px;
+}
+.candidate-actions .btn-details:hover {
+    background-color: var(--color-dark-gray);
+}
+
+.candidate-actions .btn-icon {
+    background-color: transparent;
+    border: none;
+    color: var(--color-dark-gray);
+    font-size: 1.3em;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s ease;
+}
+
+.candidate-actions .btn-icon:hover {
+    color: var(--color-black);
+}
+
+.candidate-actions .btn-remove {
+    color: #cc0000; /* Cor de remover */
+}
+.candidate-actions .btn-remove:hover {
+    color: #ff0000;
+}
+
+/* Paginação */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    gap: 10px;
+}
+
+.page-link {
+    display: inline-block;
+    padding: 8px 15px;
+    border: 1px solid var(--color-medium-gray);
+    border-radius: 5px;
+    text-decoration: none;
+    color: var(--color-dark-gray);
+    background-color: var(--color-white);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.page-link:hover {
+    background-color: var(--color-light-gray);
+}
+
+.page-link.active {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    border-color: var(--color-black);
+}
+
+.page-dots {
+    color: var(--color-dark-gray);
+    font-weight: bold;
+}
+/* ... (Seu CSS existente) ... */
+
+/* Layout específico da página de Detalhes do Candidato */
+.candidate-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    flex-wrap: wrap; /* Para quebrar linha em telas menores */
+}
+
+.candidate-details-header h2 {
+    font-size: 1.6em;
+    color: var(--color-dark-gray);
+    margin-bottom: 0; /* Remove margem inferior padrão */
+    flex-grow: 1; /* Permite que o título ocupe o espaço */
+}
+
+.candidate-actions-top {
+    display: flex;
+    gap: 10px;
+    margin-left: auto; /* Empurra para a direita */
+    flex-wrap: wrap; /* Permite que os botões quebrem linha */
+    justify-content: flex-end; /* Alinha à direita se quebrar linha */
+}
+
+.candidate-actions-top .btn {
+    padding: 10px 18px;
+    font-size: 0.9em;
+    border-radius: 5px;
+}
+
+.candidate-profile-section {
+    display: flex;
+    align-items: flex-start; /* Alinha o avatar e info no topo */
+    gap: 30px;
+    background-color: var(--color-white);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    max-width: 900px;
+    margin: 30px auto;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    background-color: var(--color-medium-gray);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4em; /* Tamanho do ícone de pessoa */
+    color: var(--color-white);
+    /* Para o ícone de pessoa (Font Awesome): */
+    content: '\f007'; /* Unicode para o ícone de usuário */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+.profile-info {
+    flex-grow: 1;
+}
+
+.profile-info p {
+    margin-bottom: 8px;
+    font-size: 1em;
+    color: var(--color-dark-gray);
+}
+
+.profile-info p strong {
+    color: var(--color-black);
+    min-width: 120px; /* Garante alinhamento dos dois pontos */
+    display: inline-block;
+}
+
+.profile-info a {
+    color: var(--color-black);
+    text-decoration: none;
+}
+
+.profile-info a:hover {
+    text-decoration: underline;
+}
+
+.contact-icon {
+    margin-right: 10px;
+    color: var(--color-medium-gray);
+}
+
+/* Navegação por abas (Tabs) */
+.tabs-navigation {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--color-light-gray);
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tabs-navigation .tab-btn {
+    background-color: transparent;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--color-medium-gray);
+    cursor: pointer;
+    transition: color 0.3s ease, border-bottom 0.3s ease;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap; /* Impede quebras de linha nos nomes das abas */
+}
+
+.tabs-navigation .tab-btn:hover {
+    color: var(--color-black);
+}
+
+.tabs-navigation .tab-btn.active {
+    color: var(--color-black);
+    border-bottom: 2px solid var(--color-black);
+}
+
+.tab-content {
+    background-color: var(--color-white);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    max-width: 900px;
+    margin: 20px auto 40px auto;
+    display: none; /* Oculta todos por padrão */
+}
+
+.tab-content.active {
+    display: block; /* Mostra o conteúdo da aba ativa */
+}
+
+.tab-content h3 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: var(--color-dark-gray);
+    border-bottom: 1px solid var(--color-light-gray);
+    padding-bottom: 10px;
+}
+
+/* Estilos da aba de Pontuação */
+.score-overall {
+    background-color: var(--color-black);
+    color: var(--color-white);
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    max-width: 300px; /* Largura para a caixa de pontuação geral */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.score-overall span {
+    color: var(--color-white);
+}
+
+.score-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Colunas flexíveis */
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.score-card {
+    background-color: var(--color-light-gray);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.score-card p {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--color-dark-gray);
+    margin-bottom: 15px;
+}
+
+.score-value {
+    font-size: 2.2em;
+    font-weight: bold;
+    color: var(--color-black);
+}
+
+.score-value span {
+    font-size: 1.5em; /* Número maior */
+    color: var(--color-black);
+}
+
+.reasons-list {
+    list-style-type: disc; /* Bolinhas */
+    margin-left: 25px;
+    color: var(--color-dark-gray);
+}
+
+.reasons-list li {
+    margin-bottom: 8px;
+    font-size: 1em;
+}
+
+/* Estilos da aba de Habilidades */
+.skill-tags {
+    display: flex;
+    flex-wrap: wrap; /* Quebra linha se houver muitas tags */
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.skill-tag {
+    background-color: var(--color-light-gray);
+    color: var(--color-dark-gray);
+    padding: 8px 15px;
+    border-radius: 20px; /* Cantos bem arredondados */
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+/* Estilos para Experiência e Formação (listas genéricas) */
+.experience-item,
+.education-item {
+    background-color: #f9f9f9; /* Um fundo levemente diferente */
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #eee;
+}
+
+.experience-item h4,
+.education-item h4 {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+    color: var(--color-black);
+}
+
+.experience-item p,
+.education-item p {
+    font-size: 0.95em;
+    color: var(--color-dark-gray);
+    margin-bottom: 10px;
+}
+
+.experience-item ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+.experience-item ul li {
+    margin-bottom: 5px;
+}
+
+/* Estilos para Idiomas */
+.language-list {
+    list-style-type: disc;
+    margin-left: 25px;
+    color: var(--color-dark-gray);
+}
+
+.language-list li {
+    margin-bottom: 8px;
+    font-size: 1em;
+}
+
+/* Botão de download do currículo */
+.btn-download-cv {
+    display: block; /* Ocupa a linha inteira */
+    width: fit-content;
+    margin: 40px auto; /* Centraliza */
+    background-color: var(--color-medium-gray);
+    color: var(--color-dark-gray);
+    padding: 15px 30px;
+    font-size: 1.1em;
+    border-radius: 8px;
+}
+
+.btn-download-cv:hover {
+    background-color: var(--color-dark-gray);
+    color: var(--color-white);
+}
+
+/* Responsividade básica para detalhes do candidato */
+@media (max-width: 768px) {
+    .candidate-details-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .candidate-actions-top {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .candidate-profile-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .profile-info p strong {
+        min-width: unset;
+        display: inline;
+    }
+    .tabs-navigation {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .tabs-navigation .tab-btn {
+        flex: 1 1 auto; /* Permite que os botões se ajustem */
+        min-width: 100px;
+    }
+    .score-details-grid {
+        grid-template-columns: 1fr; /* Uma coluna em telas pequenas */
+    }
+}
+/* ... (Seu CSS existente) ... */
+
+/* Estilos específicos da página de Agendamento de Entrevista */
+.card-form-interview {
+    background-color: var(--color-light-gray);
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    max-width: 700px; /* Largura do card */
+    width: 100%;
+    margin-top: 20px;
+    position: relative; /* Para ajustes de posicionamento */
+}
+
+.main-content h2 {
+    text-align: center;
+    margin-top: -10px; /* Ajuste para o espaçamento do topo */
+    margin-bottom: 40px;
+    font-size: 1.8em;
+}
+
+.main-content h2 span {
+    color: var(--color-black); /* Para destacar o nome do candidato */
+}
+
+.form-row {
+    display: flex;
+    gap: 30px; /* Espaço entre os campos */
+    margin-bottom: 20px;
+}
+
+.form-row .input-group {
+    flex: 1; /* Faz os grupos de input ocuparem espaço igual */
+    margin-bottom: 0; /* Remove margem inferior padrão */
+}
+
+.form-actions-bottom {
+    display: flex;
+    justify-content: flex-end; /* Alinha botões à direita */
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.form-actions-bottom .btn {
+    padding: 12px 30px;
+    font-size: 1em;
+}
+
+/* Responsividade para a página de agendamento */
+@media (max-width: 768px) {
+    .card-form-interview {
+        padding: 30px;
+    }
+    .form-row {
+        flex-direction: column; /* Pilha os campos em telas menores */
+        gap: 0; /* Remove o gap */
+    }
+    .form-row .input-group {
+        margin-bottom: 20px; /* Adiciona margem entre campos empilhados */
+    }
+    .form-actions-bottom {
+        flex-direction: column; /* Pilha os botões */
+        align-items: stretch; /* Estica os botões para a largura total */
+    }
+}
+/* ... (Seu CSS existente) ... */
+
+/* Estilos específicos da página de Vagas */
+.main-content h2 {
+    text-align: left; /* Alinha o título à esquerda */
+    margin-left: 20px; /* Para alinhar com a seta */
+    margin-top: -10px; /* Ajuste para o espaçamento */
+    margin-bottom: 30px;
+    font-size: 1.8em;
+}
+
+.btn-new-vaga {
+    display: block; /* Ocupa a linha inteira */
+    width: fit-content; /* Largura se ajusta ao conteúdo */
+    margin: 0 auto 40px auto; /* Centraliza e adiciona margem inferior */
+    padding: 15px 40px; /* Aumenta o padding */
+    font-size: 1.2em;
+    border-radius: 8px;
+    text-transform: uppercase; /* Para combinar com o Figma */
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.job-list {
+    max-width: 900px; /* Largura máxima da lista */
+    margin: 0 auto 30px auto;
+    background-color: var(--color-white);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.job-item {
+    padding: 20px 25px;
+    border-bottom: 1px solid #eee;
+}
+
+.job-item:last-child {
+    border-bottom: none;
+}
+
+.job-item:hover {
+    background-color: #f9f9f9;
+}
+
+.job-title-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.job-title {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: var(--color-black);
+}
+
+.job-status-dropdown {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-light-gray);
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: var(--color-dark-gray);
+    cursor: pointer; /* Indica que é clicável */
+}
+
+.status-arrow {
+    margin-left: 10px;
+    font-size: 0.8em; /* Seta menor */
+}
+
+.job-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.candidate-count {
+    font-size: 1em;
+    color: var(--color-dark-gray);
+}
+
+.link-view-candidates {
+    background-color: transparent;
+    color: var(--color-black);
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px; /* Padding para o link parecer um botão discreto */
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.link-view-candidates:hover {
+    background-color: var(--color-light-gray);
+}
+
+/* Responsividade básica para vagas */
+@media (max-width: 600px) {
+    .job-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .job-title-status {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .job-details {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+/* Adicione esta regra no seu style.css */
+.page-header-with-arrow {
+    display: flex;
+    align-items: center; /* Alinha a seta e o título verticalmente */
+    gap: 20px; /* Espaço entre a seta e o título */
+    margin-left: 20px; /* Margem da esquerda */
+    margin-top: 20px; /* Margem do topo */
+    margin-bottom: 30px; /* Espaço abaixo do cabeçalho */
+}
+
+.page-header-with-arrow h2 {
+    margin: 0; /* Remove margens padrão do h2 para que o flexbox controle */
+    font-size: 1.8em; /* Garante o tamanho do título */
+    text-align: left; /* Garante alinhamento à esquerda */
+}
+
+/* Você pode remover a margem-esquerda e margem-top antigas do h2 se elas existirem */
+/* .main-content h2 {
+    text-align: left;
+    margin-left: 20px;
+    margin-top: -10px;
+    margin-bottom: 30px;
+    font-size: 1.8em;
+} */
+/* Remova ou ajuste o bloco acima para evitar conflitos */
+/* ... (Seu CSS existente) ... */
+
+/* Estilos do Modal (Pop-up) */
+.modal {
+    display: none; /* Escondido por padrão */
+    position: fixed; /* Fica por cima de tudo */
+    z-index: 1000; /* Z-index alto para ficar acima de outros elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Permite scroll se o conteúdo for grande */
+    background-color: rgba(0,0,0,0.4); /* Fundo semi-transparente */
+    display: flex; /* Para centralizar o conteúdo */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: var(--color-white);
+    margin: auto; /* Centraliza vertical e horizontalmente */
+    padding: 30px;
+    border: 1px solid var(--color-medium-gray);
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px; /* Largura máxima do modal */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-align: center;
+    position: relative;
+}
+
+.close-button {
+    color: var(--color-medium-gray);
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: var(--color-black);
+    text-decoration: none;
+}
+
+.modal-content h3 {
+    font-size: 1.5em;
+    margin-bottom: 25px;
+    color: var(--color-dark-gray);
+}
+
+.modal-content h3 #modalCandidateName {
+    color: var(--color-black);
+}
+
+.modal-option-btn {
+    display: block; /* Cada botão em uma nova linha */
+    width: 90%;
+    margin: 15px auto; /* Espaçamento entre os botões */
+    padding: 12px 20px;
+    font-size: 1.1em;
+    border-radius: 8px;
+}
+
+.btn-danger {
+    background-color: #dc3545; /* Cor vermelha para Excluir */
+    color: var(--color-white);
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Novo estilo para o header da página de candidatos ranqueados */
+.page-header-with-arrow {
+    display: flex;
+    align-items: center; /* Alinha a seta e o título verticalmente */
+    gap: 20px; /* Espaço entre a seta e o título */
+    margin-left: 20px; /* Margem da esquerda */
+    margin-top: 20px; /* Margem do topo */
+    margin-bottom: 30px; /* Espaço abaixo do cabeçalho */
+}
+
+.page-header-with-arrow h2 {
+    margin: 0; /* Remove margens padrão do h2 para que o flexbox controle */
+    font-size: 1.8em; /* Garante o tamanho do título */
+    text-align: left; /* Garante alinhamento à esquerda */
+}
