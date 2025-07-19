@@ -3,30 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APB Vision - Home</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Dashboard | APB Vision</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_moderno.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Estilos específicos para o Dashboard, movidos de volta para cá para evitar poluir o style_moderno.css */
+        body { background: var(--background, #f7f8fa); color: var(--text, #222); } /* Ajustei cor de fundo/texto para o tema moderno */
+        .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .dashboard-title { font-size: 2.2rem; margin-bottom: 1.5rem; text-align: center; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+        .chart-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); padding: 1.5rem; transition: box-shadow 0.3s; }
+        .chart-card:hover { box-shadow: 0 4px 32px rgba(0,0,0,0.15); }
+        .logo-dashboard { width: 180px; display: block; margin: 0 auto 2rem; } /* Novo ID para o logo do dashboard para evitar conflito com o header */
+
+        /* Ajustes para os cards de KPI na dashboard */
+        .kpi-cards-wrapper {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            gap: 2rem;
+        }
+        .kpi-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+            padding: 24px;
+            min-width: 220px;
+            text-align: center;
+        }
+        .kpi-card h3 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            color: #555;
+        }
+        .kpi-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #0077ff;
+        }
+        #topHabilidades {
+            font-size: 1.1rem;
+            margin: 0;
+            padding-left: 1.2em;
+            text-align: left;
+            list-style: decimal; /* Para lista numerada */
+        }
+        #topHabilidades li span {
+            color:#0077ff;
+            font-weight:bold;
+        }
+    </style>
 </head>
 <body class="navbar-layout">
     <div class="header">
-        <div class="logo">APB <span class="logo-vision">Vision</span></div>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/logo_apb_vision.png') }}" alt="Logo APB Vision" style="height:48px;vertical-align:middle;margin-right:12px;background:transparent;">
+            <span>APB <span class="logo-vision">Vision</span></span>
+        </div>
         <nav class="navbar">
             <ul>
                 <li><a href="/home" class="active">Home</a></li>
                 <li><a href="/vagas">Vagas</a></li>
                 <li><a href="/candidatos_ranqueados">Candidatos</a></li>
-                <li><a href="#">Configurações</a></li> </ul>
+                <li><a href="#">Configurações</a></li>
+            </ul>
         </nav>
         <div class="user-info">
-            <img src="{{ url_for('static', filename='images/user_profile.jpg') }}" alt="Foto de perfil"> <span>Olá, Ana!</span>
+            <img src="{{ url_for('static', filename='images/user_profile.jpg') }}" alt="Foto de perfil">
+            <span>Olá, Ana!</span>
         </div>
     </div>
 
     <div class="main-content content-wrapper">
         <div class="container-central">
             <div class="card-action">
-                <i class="fas fa-search icon-card-action"></i> <h2>Comece a Otimizar suas Contratações</h2>
+                <i class="fas fa-search icon-card-action"></i>
+                <h2>Comece a Otimizar suas Contratações</h2>
                 <button class="btn btn-primary" id="btnIniciarTriagem">Iniciar Triagem</button>
+            </div>
+        </div>
+
+        <div class="dashboard-container">
+            <h1 class="dashboard-title">Dashboard Inteligente</h1>
+            <div class="kpi-cards-wrapper">
+                <div class="kpi-card">
+                    <h3>Total de Candidatos</h3>
+                    <div class="value"> <span id="totalCandidatos">0</span> </div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Média de Pontuação</h3>
+                    <div class="value"> <span id="mediaPontuacao">0</span> </div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Total de Experiências</h3>
+                    <div class="value"> <span id="totalExperiencias">0</span> </div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Top 5 Habilidades</h3>
+                    <ol id="topHabilidades"></ol>
+                </div>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h2>Pontuação dos Candidatos</h2>
+                    <canvas id="pontuacaoChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h2>Distribuição de Pontuação</h2>
+                    <canvas id="histogramaChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h2>Habilidades Mais Comuns</h2>
+                    <canvas id="habilidadesChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h2>Formações Acadêmicas</h2>
+                    <canvas id="formacaoChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h2>Idiomas</h2>
+                    <canvas id="idiomasChart"></canvas>
+                </div>
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Estas são variáveis que podem ser usadas em múltiplas lógicas, se necessário.
-    // Defina-as aqui no escopo global do DCL.
+    // Defina-as aqui no escopo global do DOMContentLoaded.
     const modal = document.getElementById('candidateOptionsModal');
     const modalCandidateName = document.getElementById('modalCandidateName');
     const btnReproveCandidate = document.getElementById('btnReproveCandidate');
@@ -10,7 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentCandidateId = null; // Usada para armazenar o ID do candidato clicado no modal
 
-    // Lógica para a página de Login (presente apenas em login.html)
+
+    // --- Lógica para a página de Login (presente apenas em login.html) ---
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', (event) => {
@@ -20,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Lógica para a Dashboard (presente apenas em dashboard.html)
+    // --- Lógica para a Dashboard (presente apenas em dashboard.html) ---
     const btnIniciarTriagemDashboard = document.getElementById("btnIniciarTriagem");
     if (btnIniciarTriagemDashboard) {
         btnIniciarTriagemDashboard.addEventListener('click', () => {
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Lógica para a página de Upload de Currículos (presente apenas em upload.html)
+    // --- Lógica para a página de Upload de Currículos (presente apenas em upload.html) ---
     const btnSelecionarArquivos = document.getElementById('btnSelecionarArquivos');
     const arquivoInput = document.getElementById('arquivo');
     const dragDropArea = document.getElementById('dragDropArea');
@@ -48,16 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dragDropArea.addEventListener(eventName, preventDefaults, false);
-        });
-
+        // Funções auxiliares para Drag and Drop (declaradas dentro do if para escopo local)
         function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-        ['dragenter', 'dragover'].forEach(eventName => { dragDropArea.addEventListener(eventName, highlight, false); });
-        ['dragleave', 'drop'].forEach(eventName => { dragDropArea.addEventListener(eventName, unhighlight, false); });
         function highlight() { dragDropArea.classList.add('highlight'); }
         function unhighlight() { dragDropArea.classList.remove('highlight'); }
-        dragDropArea.addEventListener('drop', handleDrop, false);
         function handleDrop(e) {
             const dt = e.dataTransfer;
             const files = dt.files;
@@ -65,6 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const fileNames = Array.from(arquivoInput.files).map(file => file.name).join(', ');
             alert(`Arquivo(s) solto(s): ${files.length} - ${fileNames}`);
         }
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dragDropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => { dragDropArea.addEventListener(eventName, highlight, false); });
+        ['dragleave', 'drop'].forEach(eventName => { dragDropArea.addEventListener(eventName, unhighlight, false); });
+        dragDropArea.addEventListener('drop', handleDrop, false);
 
         btnVoltarUpload.addEventListener('click', () => {
             window.location.href = "/home";
@@ -114,33 +116,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
-    // Lógica para a página de Candidatos Ranqueados (results.html)
+    // --- Lógica para a página de Candidatos Ranqueados (results.html) ---
     const candidateList = document.getElementById('candidateList');
-    const flaskDataElement = document.getElementById('flask-data'); // Elemento para pegar os dados do Flask
+    // Usa a variável global FLASK_CANDIDATES_DATA definida no <head> do results.html
+    let realCandidates = Array.isArray(window.FLASK_CANDIDATES_DATA) ? window.FLASK_CANDIDATES_DATA : [];
 
-    if (candidateList && flaskDataElement) { // Verifica se estamos na página de resultados e se o elemento de dados existe
-        let realCandidates = [];
-        const rawCandidatesData = flaskDataElement.dataset.candidates; // Pega a string bruta do atributo
 
-        // Verifica se a string não está vazia e tenta fazer o parse
-        if (rawCandidatesData && rawCandidatesData.trim() !== '') {
-            try {
-                realCandidates = JSON.parse(rawCandidatesData);
-            } catch (e) {
-                console.error("Erro ao parsear dados de candidatos do Flask:", e);
-                // Se houver um erro de parse, realCandidates permanece como []
-            }
-        } else {
-            // Se a string for vazia ou só espaços em branco, realCandidates permanece como []
-            console.log("Nenhum dado de candidato encontrado no atributo data-candidates. Assumindo lista vazia.");
-        }
-
+    if (candidateList) { // Verifica se estamos na página de resultados
         const searchCandidate = document.getElementById('searchCandidate');
         const sortOrder = document.getElementById('sortOrder');
 
+        // Funções internas para renderizar, filtrar e ordenar (declaradas DENTRO deste if)
         function renderCandidates(candidatesToRender) {
             candidateList.innerHTML = '';
-            if (candidatesToRender.length === 0) {
+            if (!Array.isArray(candidatesToRender) || candidatesToRender.length === 0) { // Adicionado verificação de array
                 candidateList.innerHTML = '<p style="text-align: center; margin-top: 30px;">Nenhum candidato encontrado.</p>';
                 return;
             }
@@ -174,19 +163,45 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (modal) modal.style.display = 'flex';
                 });
             });
+
+            // Adiciona event listener para o botão de adicionar contato (agendar entrevista)
+            document.querySelectorAll('.btn-add').forEach(button => { // Usar document.querySelectorAll aqui
+                button.addEventListener('click', (event) => {
+                    // Pega o ID e o nome do candidato mais próximo
+                    const candidateItemElement = event.target.closest('.candidate-item');
+                    const candidateId = candidateItemElement.querySelector('.btn-ver-detalhes').dataset.id;
+                    const candidateName = candidateItemElement.querySelector('.candidate-name').innerText;
+                    
+                    // Redireciona para a página de agendamento de entrevista
+                    window.location.href = `/agendar_entrevista_page?id=${candidateId}&name=${encodeURIComponent(candidateName)}`; // Use agendar_entrevista_page
+                    
+                    // Ou, para integração futura (se for API):
+                    /*
+                    fetch(`/adicionar_contato/${candidateId}`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao adicionar contato:', error);
+                        alert('Erro ao adicionar contato.');
+                    });
+                    */
+                });
+            });
         }
 
         function filterAndSortCandidates() {
-            let filtered = [...realCandidates];
+            let filtered = Array.isArray(realCandidates) ? [...realCandidates] : []; // Garante que é um array
 
-            const searchTerm = searchCandidate.value.toLowerCase();
+            const searchTerm = searchCandidate && searchCandidate.value ? searchCandidate.value.toLowerCase() : ''; // Adicionado verificação
             if (searchTerm) {
                 filtered = filtered.filter(candidate =>
                     (candidate.nome && candidate.nome.toLowerCase().includes(searchTerm))
                 );
             }
 
-            const sortValue = sortOrder.value;
+            const sortValue = sortOrder && sortOrder.value ? sortOrder.value : 'pontuacao_desc'; // Adicionado verificação
             if (sortValue === "pontuacao_desc") {
                 filtered.sort((a, b) => (b.pontuacao || 0) - (a.pontuacao || 0));
             } else if (sortValue === "pontuacao_asc") {
@@ -200,16 +215,21 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCandidates(filtered);
         }
 
-        searchCandidate.addEventListener('input', filterAndSortCandidates);
-        sortOrder.addEventListener('change', filterAndSortCandidates);
-        filterAndSortCandidates(); // Renderiza na carga da página
+        // Event Listeners para busca e ordenação (dentro deste if)
+        if (searchCandidate) { // Adicionado verificação
+            searchCandidate.addEventListener('input', filterAndSortCandidates);
+        }
+        if (sortOrder) { // Adicionado verificação
+            sortOrder.addEventListener('change', filterAndSortCandidates);
+        }
+        filterAndSortCandidates(); // Renderiza na carga da página (chamada inicial DENTRO deste if)
 
         if (modal) { // Lógica do Modal (verificando existência)
-            if (closeButton) closeButton.onclick = function() { modal.style.display = 'none'; }
+            if (closeButton) closeButton.onclick = function() { modal.style.display = 'none'; };
             window.onclick = function(event) {
                 if (event.target == modal) { modal.style.display = 'none'; }
-            }
-            if (btnCancelOption) btnCancelOption.onclick = function() { modal.style.display = 'none'; }
+            };
+            if (btnCancelOption) btnCancelOption.onclick = function() { modal.style.display = 'none'; };
 
             if (btnReproveCandidate) {
                 btnReproveCandidate.onclick = function() {
@@ -226,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 alert('Erro ao reprovar candidato.');
                             });
                     }
-                }
+                };
             }
 
             if (btnDeleteCandidate) {
@@ -246,22 +266,19 @@ document.addEventListener('DOMContentLoaded', () => {
                                 });
                         }
                     }
-                }
+                };
             }
         }
     }
 
+
     // Lógica para a página de Detalhes do Candidato (candidate_details.html)
     const dynamicCandidateNameSpan = document.getElementById('dynamicCandidateName');
-    const flaskCandidateDataElement = document.getElementById('flask-candidate-data'); // Elemento para pegar os dados do candidato
+    let candidateDataDetailsPage = {}; // Renomeado para evitar conflito com 'candidateData' global, se houver
 
-    if (dynamicCandidateNameSpan && flaskCandidateDataElement) { // Verifica se estamos na página de detalhes
-        let candidateData = {};
-        try {
-            candidateData = JSON.parse(flaskCandidateDataElement.dataset.candidate || '{}');
-        } catch (e) {
-            console.error("Erro ao parsear dados do candidato do Flask:", e);
-        }
+    // Verifica se estamos na página de detalhes E se a variável global de detalhes existe
+    if (dynamicCandidateNameSpan && window.FLASK_CANDIDATE_DETAILS_DATA) {
+        candidateDataDetailsPage = window.FLASK_CANDIDATE_DETAILS_DATA; // Pega os dados da global
 
         const tabButtons = document.querySelectorAll('.tabs-navigation .tab-btn');
         const tabContents = document.querySelectorAll('.tab-content');
@@ -276,37 +293,50 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        if (candidateData) {
-            dynamicCandidateNameSpan.innerText = candidateData.nome ? candidateData.nome.toUpperCase() : 'NOME INDISPONÍVEL';
-            document.getElementById('candidateAge').innerText = candidateData.idade || '--';
-            document.getElementById('candidateDesiredRole').innerText = candidateData.cargo_desejado || '--';
-            document.getElementById('candidateLastRole').innerText = candidateData.ultimo_cargo || '--';
-            document.getElementById('candidateAvailability').innerText = candidateData.disponibilidade || '--';
-            document.getElementById('candidateEmail').innerText = candidateData.email || 'N/A';
-            document.getElementById('candidatePhone').innerText = candidateData.telefone || 'N/A';
+        if (candidateDataDetailsPage) { // Usa a variável renomeada
+            // Preenche o título da página
+            document.getElementById('candidateNameTitle').innerText = `DETALHES DO CANDIDATO: ${candidateDataDetailsPage.nome ? candidateDataDetailsPage.nome.toUpperCase() : 'NOME INDISPONÍVEL'}`;
+            
+            // Preenche informações de perfil
+            document.getElementById('candidateAge').innerText = candidateDataDetailsPage.idade || '--';
+            document.getElementById('candidateDesiredRole').innerText = candidateDataDetailsPage.cargo_desejado || '--';
+            document.getElementById('candidateLastRole').innerText = candidateDataDetailsPage.ultimo_cargo || '--';
+            document.getElementById('candidateAvailability').innerText = candidateDataDetailsPage.disponibilidade || '--';
+            document.getElementById('candidateEmail').innerText = candidateDataDetailsPage.email || 'N/A';
+            document.getElementById('candidatePhone').innerText = candidateDataDetailsPage.telefone || 'N/A';
 
             const linkedinLink = document.getElementById('candidateLinkedin');
-            if (linkedinLink) { // Verificação adicional
-                if (candidateData.linkedin) {
-                    linkedinLink.href = candidateData.linkedin.startsWith('http') ? candidateData.linkedin : `https://${candidateData.linkedin}`;
-                    linkedinLink.innerText = candidateData.linkedin.replace(/^(https?:\/\/)?(www\.)?linkedin\.com\/in\//, '');
+            if (linkedinLink) {
+                if (candidateDataDetailsPage.linkedin) {
+                    linkedinLink.href = candidateDataDetailsPage.linkedin.startsWith('http') ? candidateDataDetailsPage.linkedin : `https://${candidateDataDetailsPage.linkedin}`;
+                    linkedinLink.innerText = candidateDataDetailsPage.linkedin.replace(/^(https?:\/\/)?(www\.)?linkedin\.com\/in\//, '');
                 } else {
                     linkedinLink.innerText = 'N/A';
-                    linkedinLink.removeAttribute('href'); // Remove o link se não houver URL
+                    linkedinLink.removeAttribute('href');
                 }
             }
 
+
             // Pontuação
-            document.getElementById('overallScore').innerText = candidateData.pontuacaoGeral || 0;
-            document.querySelector('#tabPontuacao .score-card:nth-child(1) .score-value span').innerText = candidateData.fitTecnico || 0;
-            document.querySelector('#tabPontuacao .score-card:nth-child(2) .score-value span').innerText = candidateData.experienciaRelevante || 0;
-            document.querySelector('#tabPontuacao .score-card:nth-child(3) .score-value span').innerText = candidateData.fitCultural || 0;
+            document.getElementById('overallScore').innerText = (candidateDataDetailsPage.pontuacaoGeral || 0) + '%';
+            const fitTecnicoSpan = document.querySelector('#tabPontuacao .score-card:nth-child(1) .score-value span');
+            if (fitTecnicoSpan) fitTecnicoSpan.innerText = candidateDataDetailsPage.fitTecnico || 0;
+            const experienciaRelevanteSpan = document.querySelector('#tabPontuacao .score-card:nth-child(2) .score-value span');
+            if (experienciaRelevanteSpan) experienciaRelevanteSpan.innerText = candidateDataDetailsPage.experienciaRelevante || 0;
+            const fitCulturalSpan = document.querySelector('#tabPontuacao .score-card:nth-child(3) .score-value span');
+            if (fitCulturalSpan) fitCulturalSpan.innerText = candidateDataDetailsPage.fitCultural || 0;
 
             const reasonsList = document.querySelector('#tabPontuacao .reasons-list');
-            if (reasonsList) { // Verificação adicional
+            if (reasonsList) {
                 reasonsList.innerHTML = '';
-                if (candidateData.motivosPontuacao && candidateData.motivosPontuacao.length > 0) {
-                    candidateData.motivosPontuacao.forEach(reason => {
+                if (candidateDataDetailsPage.motivos_pontuacao && candidateDataDetailsPage.motivos_pontuacao.length > 0) {
+                    candidateDataDetailsPage.motivos_pontuacao.forEach(reason => {
+                        const li = document.createElement('li');
+                        li.innerText = reason;
+                        reasonsList.appendChild(li);
+                    });
+                } else if (candidateDataDetailsPage.motivosPontuacao && candidateDataDetailsPage.motivosPontuacao.length > 0) { // Fallback para nome antigo
+                    candidateDataDetailsPage.motivosPontuacao.forEach(reason => {
                         const li = document.createElement('li');
                         li.innerText = reason;
                         reasonsList.appendChild(li);
@@ -316,12 +346,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            // Análise da IA
+            const geminiAnalysisTextElement = document.getElementById('geminiAnalysisText');
+            if (geminiAnalysisTextElement) {
+                geminiAnalysisTextElement.innerText = candidateDataDetailsPage.analise_ia || 'N/A';
+            }
+
+
             // Habilidades
             const skillTagsContainer = document.querySelector('#tabHabilidades .skill-tags');
-            if (skillTagsContainer) { // Verificação adicional
+            if (skillTagsContainer) {
                 skillTagsContainer.innerHTML = '';
-                if (candidateData.habilidades && candidateData.habilidades.length > 0) {
-                    candidateData.habilidades.forEach(skill => {
+                if (candidateDataDetailsPage.habilidades && candidateDataDetailsPage.habilidades.length > 0) {
+                    candidateDataDetailsPage.habilidades.forEach(skill => {
                         const span = document.createElement('span');
                         span.classList.add('skill-tag');
                         span.innerText = skill;
@@ -332,15 +369,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+
             // Experiência
             const experienceContainer = document.querySelector('#tabExperiencia');
-            if (experienceContainer) { // Verificação adicional
+            if (experienceContainer) {
                 experienceContainer.innerHTML = '<h3>Histórico Profissional</h3>';
-                if (candidateData.experiencia && candidateData.experiencia.length > 0) {
-                    candidateData.experiencia.forEach(exp => {
+                if (candidateDataDetailsPage.experiencia && candidateDataDetailsPage.experiencia.length > 0) {
+                    candidateDataDetailsPage.experiencia.forEach(exp => {
                         const div = document.createElement('div');
                         div.classList.add('experience-item');
-                        const activitiesHtml = exp.atividades && exp.atividades.length > 0 ? `<ul>${exp.atividades.map(act => `<li>${act}</li>`).join('')}</ul>` : '';
+                        const activitiesHtml = exp.atividades && Array.isArray(exp.atividades) && exp.atividades.length > 0 ? `<ul>${exp.atividades.map(act => `<li>${act}</li>`).join('')}</ul>` : '';
                         div.innerHTML = `
                             <h4>${exp.cargo || 'Cargo Desconhecido'}</h4>
                             <p>${exp.empresa || 'Empresa Desconhecida'} - ${exp.periodo || 'Período Indefinido'}</p>
@@ -353,12 +391,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+
             // Formação
             const formacaoContainer = document.querySelector('#tabFormacao');
-            if (formacaoContainer) { // Verificação adicional
+            if (formacaoContainer) {
                 formacaoContainer.innerHTML = '<h3>Formação Acadêmica</h3>';
-                if (candidateData.formacao && candidateData.formacao.length > 0) {
-                    candidateData.formacao.forEach(form => {
+                if (candidateDataDetailsPage.formacao && candidateDataDetailsPage.formacao.length > 0) {
+                    candidateDataDetailsPage.formacao.forEach(form => {
                         const div = document.createElement('div');
                         div.classList.add('education-item');
                         div.innerHTML = `
@@ -372,12 +411,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+
             // Idiomas
             const languageListContainer = document.querySelector('#tabIdioma .language-list');
-            if (languageListContainer) { // Verificação adicional
+            if (languageListContainer) {
                 languageListContainer.innerHTML = '';
-                if (candidateData.idiomas && candidateData.idiomas.length > 0) {
-                    candidateData.idiomas.forEach(lang => {
+                if (candidateDataDetailsPage.idiomas && candidateDataDetailsPage.idiomas.length > 0) {
+                    candidateDataDetailsPage.idiomas.forEach(lang => {
                         const li = document.createElement('li');
                         li.innerText = lang;
                         languageListContainer.appendChild(li);
@@ -387,25 +427,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+
             const btnDownloadCV = document.querySelector('.btn-download-cv');
             if (btnDownloadCV) {
                 btnDownloadCV.addEventListener('click', () => {
                     alert("Funcionalidade de download de currículo será implementada!");
                 });
             }
+
         } else {
             console.warn("Nenhum dado de candidato disponível para renderizar.");
         }
     }
 
+
     // Lógica para a página de Agendar Entrevista (agendar_entrevista.html)
     const interviewForm = document.getElementById('interviewForm');
-    if (interviewForm) { // Verifica se estamos na página de agendamento
+    if (interviewForm) {
+        // Pega o nome do candidato da URL ou usa um valor padrão
         const urlParams = new URLSearchParams(window.location.search);
-        const candidateName = urlParams.get('name') || "Marcos Vinicius Mendes";
+        const candidateIdFromUrl = urlParams.get('id'); // Pega o ID da URL
+        const candidateNameFromUrl = urlParams.get('name') || "Candidato Desconhecido"; // Pega o nome da URL
+
         const candidateNameInterviewSpan = document.getElementById('candidateNameInterview');
-        if (candidateNameInterviewSpan) { // Verifica se o elemento existe
-            candidateNameInterviewSpan.innerText = candidateName;
+        if (candidateNameInterviewSpan) {
+            candidateNameInterviewSpan.innerText = candidateNameFromUrl;
         }
 
         const btnConfirmAgendamento = document.getElementById('btnConfirmarAgendamento');
@@ -415,21 +461,27 @@ document.addEventListener('DOMContentLoaded', () => {
             btnConfirmAgendamento.addEventListener('click', (event) => {
                 event.preventDefault();
                 alert('Agendamento confirmado! (Simulação)');
-                window.location.href = "/candidatos_ranqueados";
+                // No futuro, enviaria os dados do agendamento para o backend
+                window.location.href = "/candidatos_ranqueados"; // Redireciona após agendar
             });
         }
         if (btnCancelAgendamento) {
             btnCancelAgendamento.addEventListener('click', (event) => {
                 event.preventDefault();
                 alert('Agendamento cancelado!');
-                window.location.href = "/detalhes_candidato";
+                // Redireciona de volta para os detalhes do candidato (se o ID estiver disponível)
+                if (candidateIdFromUrl) {
+                    window.location.href = `/detalhes_candidato/${candidateIdFromUrl}`;
+                } else {
+                    window.location.href = "/candidatos_ranqueados"; // Volta para a lista se o ID não estiver na URL
+                }
             });
         }
     }
 
     // Lógica para a página de Vagas (vagas.html)
     const jobListContainer = document.getElementById('jobList');
-    if (jobListContainer) { // Verifica se estamos na página de vagas
+    if (jobListContainer) {
         const mockJobs = [
             { id: 1, title: "Analista de Dados", status: "Ativa", candidatesCount: "52", link: "/candidatos_ranqueados" },
             { id: 2, title: "Desenvolvedor Python Sênior", status: "Ativa", candidatesCount: "30", link: "/candidatos_ranqueados" },

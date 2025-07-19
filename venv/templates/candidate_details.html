@@ -3,13 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APB Vision - Detalhes do Candidato</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Detalhes do Candidato | APB Vision</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_moderno.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script>
+        // Variável JavaScript global para passar dados do Flask para o JS
+        window.FLASK_CANDIDATE_DETAILS_DATA = {{ (candidate or {}) | tojson | safe }};
+    </script>
 </head>
 <body class="navbar-layout">
     <div class="header">
-        <div class="logo">APB <span class="logo-vision">Vision</span></div>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/logo_apb_vision.png') }}" alt="Logo APB Vision" style="height:48px;vertical-align:middle;margin-right:12px;background:transparent;">
+            <span>APB <span class="logo-vision">Vision</span></span>
+        </div>
         <nav class="navbar">
             <ul>
                 <li><a href="/home">Home</a></li>
@@ -27,7 +35,7 @@
     <div class="main-content content-wrapper">
         <a href="/candidatos_ranqueados" class="back-arrow"><i class="fas fa-arrow-left"></i></a>
         <div class="candidate-details-header">
-            <h2 id="candidateNameTitle">DETALHES DO CANDIDATO: <span id="dynamicCandidateName">--</span></h2>
+            <h2 id="candidateNameTitle">DETALHES DO CANDIDATO: <span id="dynamicCandidateName">{{ candidate.nome | default('NOME INDISPONÍVEL') | upper }}</span></h2>
             <div class="candidate-actions-top">
                 <button class="btn btn-primary" id="btnAgendarEntrevista">Agendar entrevista</button>
                 <button class="btn btn-primary">Reprovar Candidato</button>
@@ -38,13 +46,13 @@
         <div class="candidate-profile-section">
             <div class="profile-avatar"></div>
             <div class="profile-info">
-                <p><strong>Idade:</strong> <span id="candidateAge"></span></p>
-                <p><strong>Cargo Desejado:</strong> <span id="candidateDesiredRole"></span></p>
-                <p><strong>Último Cargo:</strong> <span id="candidateLastRole"></span></p>
-                <p><strong>Disponibilidade:</strong> <span id="candidateAvailability"></span></p>
-                <p><i class="fas fa-envelope contact-icon"></i> <span id="candidateEmail"></span></p>
-                <p><i class="fas fa-phone-alt contact-icon"></i> <span id="candidatePhone"></span></p>
-                <p><i class="fab fa-linkedin contact-icon"></i> <a href="#" target="_blank" id="candidateLinkedin"></a></p>
+                <p><strong>Idade:</strong> <span id="candidateAge">{{ candidate.idade | default('--') }}</span></p>
+                <p><strong>Cargo Desejado:</strong> <span id="candidateDesiredRole">{{ candidate.cargo_desejado | default('--') }}</span></p>
+                <p><strong>Último Cargo:</strong> <span id="candidateLastRole">{{ candidate.ultimo_cargo | default('--') }}</span></p>
+                <p><strong>Disponibilidade:</strong> <span id="candidateAvailability">{{ candidate.disponibilidade | default('--') }}</span></p>
+                <p><i class="fas fa-envelope contact-icon"></i> <span id="candidateEmail">{{ candidate.email | default('N/A') }}</span></p>
+                <p><i class="fas fa-phone-alt contact-icon"></i> <span id="candidatePhone">{{ candidate.telefone | default('N/A') }}</span></p>
+                <p><i class="fab fa-linkedin contact-icon"></i> <a href="{{ candidate.linkedin | default('#') }}" target="_blank" id="candidateLinkedin">{{ candidate.linkedin | default('N/A') }}</a></p>
             </div>
         </div>
 
@@ -58,29 +66,34 @@
 
         <div class="tab-content active" id="tabPontuacao">
             <div class="score-overall">
-                Pontuação Geral: <span id="overallScore"></span>%
+                Pontuação Geral: <span id="overallScore">{{ candidate.pontuacaoGeral | default(0) }}%</span>
             </div>
             <div class="score-details-grid">
                 <div class="score-card">
                     <p>Fit Técnico</p>
-                    <div class="score-value"><span></span> / 10</div>
+                    <div class="score-value"><span>{{ candidate.fitTecnico | default(0) }}</span> / 10</div>
                 </div>
                 <div class="score-card">
                     <p>Experiência relevante</p>
-                    <div class="score-value"><span></span> / 10</div>
+                    <div class="score-value"><span>{{ candidate.experienciaRelevante | default(0) }}</span> / 10</div>
                 </div>
                 <div class="score-card">
                     <p>Fit Cultural</p>
-                    <div class="score-value"><span></span> / 10</div>
+                    <div class="score-value"><span>{{ candidate.fitCultural | default(0) }}</span> / 10</div>
                 </div>
             </div>
             <h3>Motivos da Alta Pontuação</h3>
-            <ul class="reasons-list"></ul>
+            <ul class="reasons-list">
+                </ul>
+            <br>
+            <h3>Análise da IA (Gemini)</h3>
+            <p id="geminiAnalysisText">{{ candidate.analise_ia | default('Análise não disponível.') }}</p>
         </div>
 
         <div class="tab-content" id="tabHabilidades">
             <h3>Habilidades Chaves Detectadas</h3>
-            <div class="skill-tags"></div>
+            <div class="skill-tags">
+                </div>
         </div>
 
         <div class="tab-content" id="tabExperiencia">
@@ -93,13 +106,12 @@
 
         <div class="tab-content" id="tabIdioma">
             <h3>Idiomas</h3>
-            <ul class="language-list"></ul>
+            <ul class="language-list">
+                </ul>
         </div>
 
         <button class="btn btn-secondary btn-download-cv">Baixar currículo</button>
     </div>
-
-    <div id="flask-candidate-data" data-candidate="{{ candidate | tojson }}"></div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>

@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APB Vision - Processando</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_moderno.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body class="navbar-layout">
     <div class="header">
-        <div class="logo">APB <span class="logo-vision">Vision</span></div>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/logo_apb_vision.png') }}" alt="Logo APB Vision" style="height:48px;vertical-align:middle;margin-right:12px;background:transparent;">
+            <span>APB <span class="logo-vision">Vision</span></span>
+        </div>
         <nav class="navbar">
             <ul>
                 <li><a href="/home">Home</a></li>

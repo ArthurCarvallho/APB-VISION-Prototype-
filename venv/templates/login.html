@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>APB Vision - Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_moderno.css') }}">
 </head>
 <body class="login-body">
     <div class="header">
-        <div class="logo">APB <span class="logo-vision">Vision</span></div>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='img/logo_apb_vision.png') }}" alt="Logo APB Vision" style="height:48px;vertical-align:middle;margin-right:12px;background:transparent;">
+            <span>APB <span class="logo-vision">Vision</span></span>
         </div>
+    </div>
 
     <div class="container-central">
         <div class="card-login">
