@@ -23,11 +23,118 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Lógica para a Dashboard (presente apenas em dashboard.html) ---
     const btnIniciarTriagemDashboard = document.getElementById("btnIniciarTriagem");
-    if (btnIniciarTriagemDashboard) {
+    const dashboardContainer = document.querySelector('.dashboard-container'); // O novo container da dashboard
+
+    if (btnIniciarTriagemDashboard) { // Botão principal do card de ação
         btnIniciarTriagemDashboard.addEventListener('click', () => {
             window.location.href = "/upload_curriculos"; // Redireciona para a página de upload
         });
     }
+
+    if (dashboardContainer) { // Se estiver na página do dashboard com gráficos
+        async function fetchDashboardData() {
+            try {
+                const res = await fetch('/dashboard_data');
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return await res.json();
+            } catch (error) {
+                console.error("Erro ao buscar dados do dashboard:", error);
+                return null; // Retorna nulo em caso de erro
+            }
+        }
+
+        function renderCharts(data) {
+            if (!data) return; // Não renderiza se não houver dados
+
+            // KPIs
+            document.getElementById('totalCandidatos').textContent = data.pontuacoes ? data.pontuacoes.length : 0;
+            const media = (data.pontuacoes && data.pontuacoes.length) ? (data.pontuacoes.reduce((a, b) => a + b, 0) / data.pontuacoes.length).toFixed(1) : 0;
+            document.getElementById('mediaPontuacao').textContent = media;
+            document.getElementById('totalExperiencias').textContent = data.experiencias || 0;
+
+            const topHabilidadesList = document.getElementById('topHabilidades');
+            if (topHabilidadesList && data.habilidades) {
+                const habilidadesArr = Object.entries(data.habilidades).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                topHabilidadesList.innerHTML = habilidadesArr.map(([h, v]) => `<li>${h} <span style='color:#0077ff;font-weight:bold;'>(${v})</span></li>`).join('');
+            }
+
+            // Gráficos (Só renderiza se o canvas existir)
+            if (document.getElementById('pontuacaoChart')) {
+                new Chart(document.getElementById('pontuacaoChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.pontuacoes ? data.pontuacoes.map((_, i) => `Candidato ${i + 1}`) : [],
+                        datasets: [{
+                            label: 'Pontuação',
+                            data: data.pontuacoes || [],
+                            backgroundColor: 'rgba(0, 123, 255, 0.7)'
+                        }]
+                    },
+                    options: { responsive: true, plugins: { legend: { display: false } }, animation: { duration: 1200 } }
+                });
+            }
+            if (document.getElementById('histogramaChart')) {
+                const bins = [0, 20, 40, 60, 80, 100];
+                const hist = bins.map((b, i) => (data.pontuacoes || []).filter(p => p >= (bins[i - 1] || 0) && p <= b).length);
+                new Chart(document.getElementById('histogramaChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: bins.map((b, i) => i === 0 ? `0-${b}` : `${bins[i - 1] + 1}-${b}`),
+                        datasets: [{
+                            label: 'Distribuição',
+                            data: hist,
+                            backgroundColor: 'rgba(40,167,69,0.7)'
+                        }]
+                    },
+                    options: { responsive: true, plugins: { legend: { display: false } }, animation: { duration: 1200 } }
+                });
+            }
+            if (document.getElementById('habilidadesChart')) {
+                new Chart(document.getElementById('habilidadesChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.habilidades ? Object.keys(data.habilidades) : [],
+                        datasets: [{
+                            label: 'Habilidades',
+                            data: data.habilidades ? Object.values(data.habilidades) : [],
+                            backgroundColor: ['#007bff', '#28a745', '#ffc107', '#17a2b8', '#6610f2', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#343a40']
+                        }]
+                    },
+                    options: { responsive: true, animation: { animateScale: true } }
+                });
+            }
+            if (document.getElementById('formacaoChart')) {
+                new Chart(document.getElementById('formacaoChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: data.formacoes ? Object.keys(data.formacoes) : [],
+                        datasets: [{
+                            label: 'Formações',
+                            data: data.formacoes ? Object.values(data.formacoes) : [],
+                            backgroundColor: ['#17a2b8', '#6610f2', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#343a40', '#007bff', '#28a745', '#ffc107']
+                        }]
+                    },
+                    options: { responsive: true, animation: { animateScale: true } }
+                });
+            }
+            if (document.getElementById('idiomasChart')) {
+                new Chart(document.getElementById('idiomasChart'), {
+                    type: 'polarArea',
+                    data: {
+                        labels: data.idiomas ? Object.keys(data.idiomas) : [],
+                        datasets: [{
+                            label: 'Idiomas',
+                            data: data.idiomas ? Object.values(data.idiomas) : [],
+                            backgroundColor: ['#ffc107', '#17a2b8', '#6610f2', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#343a40', '#007bff', '#28a745']
+                        }]
+                    },
+                    options: { responsive: true, animation: { animateRotate: true } }
+                });
+            }
+        }
+        fetchDashboardData().then(renderCharts);
+    }
+
 
     // --- Lógica para a página de Upload de Currículos (presente apenas em upload.html) ---
     const btnSelecionarArquivos = document.getElementById('btnSelecionarArquivos');
@@ -36,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnVoltarUpload = document.getElementById('btnVoltarUpload');
     const btnIniciarTriagemUpload = document.getElementById('btnIniciarTriagemUpload');
 
-    // Verifica se os elementos da página de upload existem antes de adicionar listeners
     if (btnSelecionarArquivos && arquivoInput && dragDropArea && btnVoltarUpload && btnIniciarTriagemUpload) {
         btnSelecionarArquivos.addEventListener('click', () => {
             arquivoInput.click();
@@ -49,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Funções auxiliares para Drag and Drop (declaradas dentro do if para escopo local)
         function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
         function highlight() { dragDropArea.classList.add('highlight'); }
         function unhighlight() { dragDropArea.classList.remove('highlight'); }
@@ -167,41 +272,26 @@ document.addEventListener('DOMContentLoaded', () => {
             // Adiciona event listener para o botão de adicionar contato (agendar entrevista)
             document.querySelectorAll('.btn-add').forEach(button => { // Usar document.querySelectorAll aqui
                 button.addEventListener('click', (event) => {
-                    // Pega o ID e o nome do candidato mais próximo
                     const candidateItemElement = event.target.closest('.candidate-item');
                     const candidateId = candidateItemElement.querySelector('.btn-ver-detalhes').dataset.id;
                     const candidateName = candidateItemElement.querySelector('.candidate-name').innerText;
                     
-                    // Redireciona para a página de agendamento de entrevista
-                    window.location.href = `/agendar_entrevista_page?id=${candidateId}&name=${encodeURIComponent(candidateName)}`; // Use agendar_entrevista_page
-                    
-                    // Ou, para integração futura (se for API):
-                    /*
-                    fetch(`/adicionar_contato/${candidateId}`, { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                    })
-                    .catch(error => {
-                        console.error('Erro ao adicionar contato:', error);
-                        alert('Erro ao adicionar contato.');
-                    });
-                    */
+                    window.location.href = `/agendar_entrevista_page?id=${candidateId}&name=${encodeURIComponent(candidateName)}`;
                 });
             });
         }
 
         function filterAndSortCandidates() {
-            let filtered = Array.isArray(realCandidates) ? [...realCandidates] : []; // Garante que é um array
+            let filtered = Array.isArray(realCandidates) ? [...realCandidates] : [];
 
-            const searchTerm = searchCandidate && searchCandidate.value ? searchCandidate.value.toLowerCase() : ''; // Adicionado verificação
+            const searchTerm = searchCandidate && searchCandidate.value ? searchCandidate.value.toLowerCase() : '';
             if (searchTerm) {
                 filtered = filtered.filter(candidate =>
                     (candidate.nome && candidate.nome.toLowerCase().includes(searchTerm))
                 );
             }
 
-            const sortValue = sortOrder && sortOrder.value ? sortOrder.value : 'pontuacao_desc'; // Adicionado verificação
+            const sortValue = sortOrder && sortOrder.value ? sortOrder.value : 'pontuacao_desc';
             if (sortValue === "pontuacao_desc") {
                 filtered.sort((a, b) => (b.pontuacao || 0) - (a.pontuacao || 0));
             } else if (sortValue === "pontuacao_asc") {
@@ -294,10 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (candidateDataDetailsPage) { // Usa a variável renomeada
-            // Preenche o título da página
             document.getElementById('candidateNameTitle').innerText = `DETALHES DO CANDIDATO: ${candidateDataDetailsPage.nome ? candidateDataDetailsPage.nome.toUpperCase() : 'NOME INDISPONÍVEL'}`;
-            
-            // Preenche informações de perfil
             document.getElementById('candidateAge').innerText = candidateDataDetailsPage.idade || '--';
             document.getElementById('candidateDesiredRole').innerText = candidateDataDetailsPage.cargo_desejado || '--';
             document.getElementById('candidateLastRole').innerText = candidateDataDetailsPage.ultimo_cargo || '--';
@@ -316,8 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-
-            // Pontuação
             document.getElementById('overallScore').innerText = (candidateDataDetailsPage.pontuacaoGeral || 0) + '%';
             const fitTecnicoSpan = document.querySelector('#tabPontuacao .score-card:nth-child(1) .score-value span');
             if (fitTecnicoSpan) fitTecnicoSpan.innerText = candidateDataDetailsPage.fitTecnico || 0;
@@ -346,14 +431,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Análise da IA
             const geminiAnalysisTextElement = document.getElementById('geminiAnalysisText');
             if (geminiAnalysisTextElement) {
                 geminiAnalysisTextElement.innerText = candidateDataDetailsPage.analise_ia || 'N/A';
             }
 
 
-            // Habilidades
             const skillTagsContainer = document.querySelector('#tabHabilidades .skill-tags');
             if (skillTagsContainer) {
                 skillTagsContainer.innerHTML = '';
@@ -370,7 +453,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            // Experiência
             const experienceContainer = document.querySelector('#tabExperiencia');
             if (experienceContainer) {
                 experienceContainer.innerHTML = '<h3>Histórico Profissional</h3>';
@@ -392,7 +474,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            // Formação
             const formacaoContainer = document.querySelector('#tabFormacao');
             if (formacaoContainer) {
                 formacaoContainer.innerHTML = '<h3>Formação Acadêmica</h3>';
@@ -412,7 +493,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
 
-            // Idiomas
             const languageListContainer = document.querySelector('#tabIdioma .language-list');
             if (languageListContainer) {
                 languageListContainer.innerHTML = '';
@@ -444,10 +524,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lógica para a página de Agendar Entrevista (agendar_entrevista.html)
     const interviewForm = document.getElementById('interviewForm');
     if (interviewForm) {
-        // Pega o nome do candidato da URL ou usa um valor padrão
         const urlParams = new URLSearchParams(window.location.search);
-        const candidateIdFromUrl = urlParams.get('id'); // Pega o ID da URL
-        const candidateNameFromUrl = urlParams.get('name') || "Candidato Desconhecido"; // Pega o nome da URL
+        const candidateIdFromUrl = urlParams.get('id');
+        const candidateNameFromUrl = urlParams.get('name') || "Candidato Desconhecido";
 
         const candidateNameInterviewSpan = document.getElementById('candidateNameInterview');
         if (candidateNameInterviewSpan) {
@@ -461,19 +540,17 @@ document.addEventListener('DOMContentLoaded', () => {
             btnConfirmAgendamento.addEventListener('click', (event) => {
                 event.preventDefault();
                 alert('Agendamento confirmado! (Simulação)');
-                // No futuro, enviaria os dados do agendamento para o backend
-                window.location.href = "/candidatos_ranqueados"; // Redireciona após agendar
+                window.location.href = "/candidatos_ranqueados";
             });
         }
         if (btnCancelAgendamento) {
             btnCancelAgendamento.addEventListener('click', (event) => {
                 event.preventDefault();
                 alert('Agendamento cancelado!');
-                // Redireciona de volta para os detalhes do candidato (se o ID estiver disponível)
                 if (candidateIdFromUrl) {
                     window.location.href = `/detalhes_candidato/${candidateIdFromUrl}`;
                 } else {
-                    window.location.href = "/candidatos_ranqueados"; // Volta para a lista se o ID não estiver na URL
+                    window.location.href = "/candidatos_ranqueados";
                 }
             });
         }

@@ -1,3 +1,4 @@
+# --- Imports Essenciais ---
 import os
 import csv
 import json
@@ -5,16 +6,19 @@ import re
 import logging
 import requests
 import sqlite3
-from io import StringIO
-from openpyxl import Workbook
+from io import StringIO # <-- ADICIONADO: Necessário para manipular strings como arquivos (útil para CSV em memória)
+from openpyxl import Workbook # Necessário para criar arquivos Excel (.xlsx)
+from tempfile import NamedTemporaryFile # Necessário para criar arquivos temporários (útil para Excel)
+from datetime import datetime # Necessário para trabalhar com datas e horas (timestamp)
+import hashlib # Necessário para gerar hashes de arquivo
+
+# Importações específicas do Flask (devem vir do módulo flask)
+from flask import Flask, request, render_template, redirect, url_for, flash, session, jsonify, send_file
+
+# Importações de bibliotecas de terceiros usadas nas funções (PyPDF2, docx, spacy)
 import PyPDF2
 import docx
 import spacy
-# from spacy.matcher import Matcher # Poderia ser usado para extrair padrões mais complexos
-from datetime import datetime # Para timestamp em nomes de arquivo
-import hashlib # Para gerar hash do arquivo
-
-from flask import Flask, request, render_template, redirect, url_for, flash, session, jsonify, send_file
 
 # --- Configuração de Logging ---
 logging.basicConfig(
@@ -24,24 +28,25 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# --- Flask App Setup ---
+# --- Configuração do Aplicativo Flask ---
+# ESTAS LINHAS DEVEM VIR ANTES DE QUALQUER @app.route OU USO DE 'app'
 app = Flask(__name__)
 app.static_folder = 'static'
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'troque_esta_chave_em_producao_forte_e_aleatoria') # Chave mais robusta
-# Chave da API Gemini (Google AI) - RECOMENDADO: USE VARIÁVEL DE AMBIENTE real aqui
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'SUA_CHAVE_GEMINI_AQUI_OU_COLOQUE_A_SUA_REAL') # Use a sua chave real do Gemini aqui
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'troque_esta_chave_em_producao_forte_e_aleatoria')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyDpiPx9jKUcFYO-nKByyRhidoGT8cXQOoI') # Use a sua chave real do Gemini aqui
 
-# Garanta que a pasta 'uploads' exista
+# Garante que a pasta 'uploads' exista. Se não existir, ela é criada.
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# Garanta que a pasta 'uploads/processados' exista
+# Garante que a subpasta 'processados' dentro de 'uploads' exista.
 if not os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], 'processados')):
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'processados'))
 
 
-# --- Utility Functions ---
+# --- Funções Utilitárias de Processamento de Currículos ---
+
 def extrair_texto(caminho):
     """Extrai texto de arquivos PDF ou DOCX."""
     if caminho.endswith('.pdf'):
@@ -86,12 +91,13 @@ def processar_texto_com_spacy(texto):
     if modelo is None:
         logger.error("Modelo spaCy não disponível. Retornando Doc vazio.")
         # Se o modelo não carregar, cria um Doc vazio para evitar erros
-        return spacy.tokens.Doc(get_nlp().vocab, words=[]) if get_nlp() else None # Retorna um Doc vazio
+        # Cria um Doc vazio a partir do vocabulário, se o vocabulário estiver disponível.
+        return spacy.tokens.Doc(get_nlp().vocab, words=[]) if get_nlp() else None
     return modelo(texto)
 
 def analisar_com_gemini(dados_candidato):
     """Gera análise inteligente do candidato usando Gemini (Google AI)."""
-    if not GEMINI_API_KEY or GEMINI_API_KEY == 'AIzaSyDpiPx9jKUcFYO-nKByyRhidoGT8cXQOoI':
+    if not GEMINI_API_KEY or GEMINI_API_KEY == 'SUA_CHAVE_GEMINI_AQUI_OU_COLOQUE_A_SUA_REAL':
         logger.warning("GEMINI_API_KEY não configurada. Análise Gemini será desativada.")
         return "Análise de IA desativada: Chave de API Gemini ausente ou inválida."
 
@@ -122,14 +128,12 @@ def analisar_com_gemini(dados_candidato):
     headers = {"Content-Type": "application/json"}
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=30) # Aumentado timeout
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
         if response.status_code == 200:
             result = response.json()
             if 'candidates' in result and result['candidates']:
-                # Pega o texto da resposta do Gemini
                 gemini_text = result['candidates'][0]['content']['parts'][0]['text']
-                # Limita o tamanho para caber no campo do DB
-                return gemini_text[:1000] # Limita a 1000 caracteres
+                return gemini_text[:1000]
             else:
                 logger.warning(f"Resposta Gemini sem 'candidates' ou vazia: {result}")
                 return "Não foi possível gerar análise inteligente (resposta vazia)."
@@ -148,13 +152,16 @@ def analisar_com_gemini(dados_candidato):
 DATABASE = 'candidatos.db'
 
 def get_db():
-    """Abre conexão com o banco de dados SQLite."""
+    """Abre uma nova conexão com o banco de dados SQLite."""
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
-    """Inicializa a tabela de candidatos se não existir."""
+    """
+    Inicializa a tabela 'candidatos' no banco de dados se ela não existir.
+    Define a estrutura das colunas, incluindo 'analise_ia' e 'status'.
+    """
     with app.app_context():
         db = get_db()
         cursor = db.cursor()
@@ -176,22 +183,23 @@ def init_db():
                 idiomas TEXT,
                 motivos_pontuacao TEXT,
                 analise_ia TEXT, -- Campo para a análise do Gemini
-                status TEXT DEFAULT 'ativo',
-                data_processamento TEXT -- Para rastreabilidade
+                status TEXT DEFAULT 'ativo', -- Status do candidato (ativo, reprovado, etc.)
+                data_processamento TEXT -- Timestamp de quando o currículo foi processado
             )
         ''')
         db.commit()
         db.close()
 
-# Inicializa o DB ao iniciar o app
+# Chama a função de inicialização do banco de dados quando o aplicativo Flask é carregado.
 with app.app_context():
     init_db()
 
 
-# --- Rotas de Interface ---
+# --- Rotas de Interface (Exibição de Páginas HTML) ---
+
 @app.route('/')
 def login():
-    """Página de login."""
+    """Renderiza a página de login."""
     return render_template('login.html')
 
 @app.route('/home')
@@ -201,40 +209,50 @@ def home():
 
 @app.route('/vagas')
 def vagas():
-    """Página de vagas."""
+    """Renderiza a página de vagas."""
     return render_template('vagas.html')
 
 @app.route('/candidatos_ranqueados')
 def candidatos_ranqueados():
-    """Lista ranqueada de candidatos ativos."""
+    """
+    Renderiza a lista ranqueada de candidatos ativos.
+    Pode filtrar por pontuação mínima se o parâmetro for passado na URL.
+    """
     pontuacao_min = request.args.get('pontuacao_min', default=None, type=int)
     db = get_db()
     cursor = db.cursor()
-    query = "SELECT * FROM candidatos WHERE status = 'ativo'"
+    query = "SELECT * FROM candidatos WHERE status = 'ativo'" # Consulta SQL para candidatos ativos
     params = []
-    if pontuacao_min is not None:
+    if pontuacao_min is not None: # Adiciona filtro de pontuação se especificado
         query += " AND pontuacao >= ?"
         params.append(pontuacao_min)
-    query += " ORDER BY pontuacao DESC"
-    cursor.execute(query, params)
-    candidatos_db = cursor.fetchall()
+    query += " ORDER BY pontuacao DESC" # Ordena por pontuação decrescente
+    cursor.execute(query, params) # Executa a consulta
+    candidatos_db = cursor.fetchall() # Busca todos os resultados
     db.close()
-    candidatos_para_template = []
+    
+    candidatos_para_template = [] # Lista de dicionários para passar ao template
     for cand in candidatos_db:
-        candidatos_para_template.append(dict(cand))
+        candidatos_para_template.append(dict(cand)) # Converte cada linha do DB para um dicionário
+    
+    # Renderiza o template results.html, passando a lista de candidatos
     return render_template('results.html', candidatos=candidatos_para_template)
 
 @app.route('/detalhes_candidato/<int:candidate_id>')
 def detalhes_candidato(candidate_id):
-    """Página de detalhes do candidato."""
+    """
+    Renderiza a página de detalhes de um candidato específico.
+    Busca o candidato pelo ID no banco de dados.
+    """
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM candidatos WHERE id = ?", (candidate_id,))
-    candidato = cursor.fetchone()
+    cursor.execute("SELECT * FROM candidatos WHERE id = ?", (candidate_id,)) # Busca candidato por ID
+    candidato = cursor.fetchone() # Pega apenas um resultado
     db.close()
 
-    if candidato:
-        candidato_dict = dict(candidato)
+    if candidato: # Se o candidato for encontrado
+        candidato_dict = dict(candidato) # Converte para dicionário Python
+
         # Deserializa campos JSON que foram salvos como strings (com verificação de tipo para segurança)
         candidato_dict['habilidades'] = json.loads(candidato_dict['habilidades']) if candidato_dict['habilidades'] and isinstance(candidato_dict['habilidades'], str) else []
         candidato_dict['formacao'] = json.loads(candidato_dict['formacao']) if candidato_dict['formacao'] and isinstance(candidato_dict['formacao'], str) else []
@@ -242,52 +260,62 @@ def detalhes_candidato(candidate_id):
         candidato_dict['idiomas'] = json.loads(candidato_dict['idiomas']) if candidato_dict['idiomas'] and isinstance(candidato_dict['idiomas'], str) else []
         candidato_dict['motivos_pontuacao'] = json.loads(candidato_dict['motivos_pontuacao']) if candidato_dict['motivos_pontuacao'] and isinstance(candidato_dict['motivos_pontuacao'], str) else []
 
-        # Campos calculados para o frontend (mantidos para compatibilidade)
+        # Campos calculados para o frontend (compatibilidade com lógica JS)
         candidato_dict['pontuacaoGeral'] = candidato_dict['pontuacao']
         if candidato_dict['pontuacaoGeral'] > 0:
             candidato_dict['fitTecnico'] = max(1, min(10, round(candidato_dict['pontuacaoGeral'] * 0.9 / 10)))
             candidato_dict['experienciaRelevante'] = max(1, min(10, round(candidato_dict['pontuacaoGeral'] * 0.8 / 10)))
             candidato_dict['fitCultural'] = max(1, min(10, round(candidato_dict['pontuacaoGeral'] * 0.7 / 10)))
-        else:
+        else: # Se a pontuação for 0, os fits também são 0
             candidato_dict['fitTecnico'] = 0
             candidato_dict['experienciaRelevante'] = 0
             candidato_dict['fitCultural'] = 0
         
-        # 'analise_ia' é um campo que vem diretamente do DB agora
+        # O campo 'analise_ia' vem direto do DB
         candidato_dict['analise_ia'] = candidato['analise_ia'] if 'analise_ia' in candidato.keys() and candidato['analise_ia'] else 'N/A'
 
+        # Renderiza o template candidate_details.html, passando o dicionário do candidato
         return render_template('candidate_details.html', candidate=candidato_dict)
     
+    # Se o candidato não for encontrado, exibe mensagem flash e redireciona
     flash('Candidato não encontrado.', 'error')
     return redirect(url_for('candidatos_ranqueados'))
 
 @app.route('/upload_curriculos')
 def upload_curriculos_page():
-    """Página de upload de currículos."""
+    """Renderiza a página de upload de currículos."""
     return render_template('upload.html')
 
 @app.route('/processando_curriculos')
 def processando_curriculos_page():
-    """Página de processamento de currículos."""
+    """Renderiza a página de processamento de currículos."""
     return render_template('processing.html')
 
 @app.route('/agendar_entrevista_page')
 def agendar_entrevista_page():
-    """Página de agendamento de entrevista."""
+    """
+    Renderiza a página de agendamento de entrevista.
+    Recebe 'id' e 'name' do candidato via parâmetros de URL.
+    """
     candidate_id = request.args.get('id')
     candidate_name = request.args.get('name')
     return render_template('agendar_entrevista.html', candidate_id=candidate_id, candidate_name=candidate_name)
 
 
-# --- Rotas de Ações (Reprovar/Excluir) ---
+# --- Rotas de Ações (APIs para o Frontend) ---
+
 @app.route('/reprove_candidate/<int:candidate_id>', methods=['POST'])
 def reprove_candidate(candidate_id):
-    """Reprova candidato (status = 'reprovado')."""
+    """
+    API para reprovar um candidato (atualiza o status para 'reprovado' no DB).
+    Retorna JSON com status de sucesso/erro.
+    """
     db = get_db()
     cursor = db.cursor()
     try:
         cursor.execute("UPDATE candidatos SET status = 'reprovado' WHERE id = ?", (candidate_id,))
         db.commit()
+        # Não usa flash aqui diretamente, a mensagem é para o JS que fez a requisição
         return jsonify({'success': True, 'message': 'Candidato reprovado com sucesso!'})
     except Exception as e:
         db.rollback()
@@ -298,12 +326,16 @@ def reprove_candidate(candidate_id):
 
 @app.route('/delete_candidate/<int:candidate_id>', methods=['POST'])
 def delete_candidate(candidate_id):
-    """Exclui candidato do banco de dados."""
+    """
+    API para excluir um candidato do banco de dados permanentemente.
+    Retorna JSON com status de sucesso/erro.
+    """
     db = get_db()
     cursor = db.cursor()
     try:
         cursor.execute("DELETE FROM candidatos WHERE id = ?", (candidate_id,))
         db.commit()
+        # Não usa flash aqui diretamente
         return jsonify({'success': True, 'message': 'Candidato excluído com sucesso!'})
     except Exception as e:
         db.rollback()
@@ -477,7 +509,7 @@ def export_aprovados_excel():
         experiencia = json.loads(cand['experiencia']) if cand['experiencia'] and isinstance(cand['experiencia'], str) else []
         idiomas = json.loads(cand['idiomas']) if cand['idiomas'] and isinstance(cand['idiomas'], str) else []
         analise_ia_text = cand['analise_ia'] if 'analise_ia' in cand.keys() and cand['analise_ia'] else 'N/A'
-
+        
         arquivo_original_hash = ''
         arquivo_processado = ''
         if 'data_processamento' in cand.keys() and cand['data_processamento']:
@@ -508,59 +540,6 @@ def export_aprovados_excel():
     wb.save(tmp.name)
     tmp.close()
     return send_file(tmp.name, as_attachment=True, download_name='candidatos_aprovados.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
-@app.route('/export_aprovados_csv')
-def export_aprovados_csv():
-    """
-    Exporta apenas os candidatos aprovados (pontuação >= 60) em CSV.
-    """
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT id, nome, email, telefone, linkedin, idade, pontuacao, habilidades, formacao, experiencia, idiomas, analise_ia, data_processamento FROM candidatos WHERE status = 'ativo' AND pontuacao >= 60 ORDER BY pontuacao DESC")
-    candidatos = cursor.fetchall()
-    db.close()
-
-    si = StringIO()
-    writer = csv.writer(si)
-    writer.writerow(['ID', 'Nome', 'Email', 'Telefone', 'LinkedIn', 'Idade', 'Pontuação', 'Habilidades', 'Formação', 'Experiência', 'Idiomas', 'Análise IA', 'Arquivo Original (Hash)', 'Arquivo Processado'])
-    for cand in candidatos:
-        habilidades = json.loads(cand['habilidades']) if cand['habilidades'] and isinstance(cand['habilidades'], str) else (cand['habilidades'] if isinstance(cand['habilidades'], list) else [])
-        formacao = json.loads(cand['formacao']) if cand['formacao'] and isinstance(cand['formacao'], str) else []
-        experiencia = json.loads(cand['experiencia']) if cand['experiencia'] and isinstance(cand['experiencia'], str) else []
-        idiomas = json.loads(cand['idiomas']) if cand['idiomas'] and isinstance(cand['idiomas'], str) else []
-        analise_ia_text = cand['analise_ia'] if 'analise_ia' in cand.keys() and cand['analise_ia'] else 'N/A'
-        
-        arquivo_original_hash = ''
-        arquivo_processado = ''
-        if 'data_processamento' in cand.keys() and cand['data_processamento']:
-            partes = cand['data_processamento'].split(';')
-            for parte in partes:
-                if parte.startswith('original_hash:'):
-                    arquivo_original_hash = parte.replace('original_hash:', '')
-                elif parte.startswith('processado:'):
-                    arquivo_processado = parte.replace('processado:', '')
-        writer.writerow([
-            cand['id'],
-            cand['nome'],
-            cand['email'],
-            cand['telefone'],
-            cand['linkedin'],
-            cand['idade'],
-            cand['pontuacao'],
-            ', '.join(habilidades),
-            json.dumps(formacao),
-            json.dumps(experiencia),
-            ', '.join(idiomas),
-            analise_ia_text,
-            arquivo_original_hash,
-            arquivo_processado
-        ])
-    output = si.getvalue()
-    return app.response_class(
-        output,
-        mimetype='text/csv',
-        headers={"Content-Disposition": "attachment;filename=candidatos_aprovados.csv"}
-    )
 
 # --- Inicialização do Servidor Flask ---
 if __name__ == '__main__':
