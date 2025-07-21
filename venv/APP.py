@@ -6,16 +6,14 @@ import re
 import logging
 import requests
 import sqlite3
-from io import StringIO # <-- ADICIONADO: Necessário para manipular strings como arquivos (útil para CSV em memória)
-from openpyxl import Workbook # Necessário para criar arquivos Excel (.xlsx)
-from tempfile import NamedTemporaryFile # Necessário para criar arquivos temporários (útil para Excel)
-from datetime import datetime # Necessário para trabalhar com datas e horas (timestamp)
-import hashlib # Necessário para gerar hashes de arquivo
+from io import StringIO
+from openpyxl import Workbook
+from tempfile import NamedTemporaryFile
+from datetime import datetime
+import hashlib
 
-# Importações específicas do Flask (devem vir do módulo flask)
 from flask import Flask, request, render_template, redirect, url_for, flash, session, jsonify, send_file
 
-# Importações de bibliotecas de terceiros usadas nas funções (PyPDF2, docx, spacy)
 import PyPDF2
 import docx
 import spacy
@@ -34,13 +32,11 @@ app = Flask(__name__)
 app.static_folder = 'static'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'troque_esta_chave_em_producao_forte_e_aleatoria')
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyDpiPx9jKUcFYO-nKByyRhidoGT8cXQOoI') # Use a sua chave real do Gemini aqui
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'SUA_CHAVE_GEMINI_AQUI_OU_COLOQUE_A_SUA_REAL') # Sua chave real aqui
 
 # Garante que a pasta 'uploads' exista. Se não existir, ela é criada.
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
-
-# Garante que a subpasta 'processados' dentro de 'uploads' exista.
 if not os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], 'processados')):
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'processados'))
 
@@ -90,9 +86,9 @@ def processar_texto_com_spacy(texto):
     modelo = get_nlp()
     if modelo is None:
         logger.error("Modelo spaCy não disponível. Retornando Doc vazio.")
-        # Se o modelo não carregar, cria um Doc vazio para evitar erros
-        # Cria um Doc vazio a partir do vocabulário, se o vocabulário estiver disponível.
-        return spacy.tokens.Doc(get_nlp().vocab, words=[]) if get_nlp() else None
+        # Retorna um Doc vazio a partir do vocabulário, se o vocabulário estiver disponível.
+        # Adicionei uma verificação para get_nlp() para evitar erro se ele falhar na primeira vez
+        return spacy.tokens.Doc(get_nlp().vocab, words=[]) if get_nlp() and get_nlp().vocab else None
     return modelo(texto)
 
 def analisar_com_gemini(dados_candidato):
@@ -149,10 +145,11 @@ def analisar_com_gemini(dados_candidato):
 
 
 # --- Banco de Dados SQLite ---
-DATABASE = 'candidatos.db'
+DATABASE = 'candidatos.db' # Nome do arquivo do banco de dados
+VAGAS_DB = 'vagas.db' # Nome do banco de dados para vagas
 
 def get_db():
-    """Abre uma nova conexão com o banco de dados SQLite."""
+    """Abre uma nova conexão com o banco de dados SQLite de candidatos."""
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
@@ -182,17 +179,41 @@ def init_db():
                 experiencia TEXT,
                 idiomas TEXT,
                 motivos_pontuacao TEXT,
-                analise_ia TEXT, -- Campo para a análise do Gemini
-                status TEXT DEFAULT 'ativo', -- Status do candidato (ativo, reprovado, etc.)
-                data_processamento TEXT -- Timestamp de quando o currículo foi processado
+                analise_ia TEXT,
+                status TEXT DEFAULT 'ativo',
+                data_processamento TEXT
             )
         ''')
         db.commit()
         db.close()
 
-# Chama a função de inicialização do banco de dados quando o aplicativo Flask é carregado.
+# Função para banco de dados de vagas
+def get_vagas_db():
+    """Abre uma nova conexão com o banco de dados SQLite de vagas."""
+    conn = sqlite3.connect(VAGAS_DB)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_vagas_db():
+    """Inicializa a tabela de vagas se não existir."""
+    with app.app_context():
+        db = get_vagas_db()
+        cursor = db.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS vagas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome TEXT NOT NULL,
+                requisitos TEXT NOT NULL,
+                data_criacao TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        db.commit()
+        db.close()
+
+# Inicializa AMBOS os bancos de dados ao iniciar o app.
 with app.app_context():
     init_db()
+    init_vagas_db()
 
 
 # --- Rotas de Interface (Exibição de Páginas HTML) ---
@@ -202,15 +223,60 @@ def login():
     """Renderiza a página de login."""
     return render_template('login.html')
 
+# --- Rotas de Autenticação (APIs) ---
+USERS = [ # Usuários hardcoded para demonstração
+    {'email': 'arthur@gmail.com', 'senha': 'arthur123', 'nome': 'Arthur Carvalho'}
+]
+
+@app.route('/api/login', methods=['POST'])
+def api_login():
+    """API para autenticação de usuário."""
+    data = request.get_json()
+    email = data.get('email')
+    senha = data.get('senha')
+    for user in USERS:
+        if user['email'] == email and user['senha'] == senha:
+            session['user'] = user # Armazena informações do usuário na sessão
+            return jsonify({'success': True, 'nome': user['nome'], 'email': user['email']})
+    return jsonify({'success': False, 'message': 'Credenciais inválidas.'}), 401
+
+@app.route('/api/logout', methods=['POST'])
+def api_logout():
+    """API para deslogar usuário."""
+    session.pop('user', None) # Remove 'user' da sessão
+    return jsonify({'success': True})
+
+@app.route('/api/register', methods=['POST'])
+def api_register():
+    """API para registro de novo usuário (simples)."""
+    data = request.get_json()
+    email = data.get('email')
+    senha = data.get('senha')
+    nome = data.get('nome')
+    if not email or not senha or not nome:
+        return jsonify({'success': False, 'message': 'Todos os campos são obrigatórios.'}), 400
+    for user in USERS:
+        if user['email'] == email:
+            return jsonify({'success': False, 'message': 'Email já cadastrado.'}), 400
+    USERS.append({'email': email, 'senha': senha, 'nome': nome}) # Adiciona novo usuário (apenas em memória)
+    return jsonify({'success': True, 'nome': nome, 'email': email})
+
 @app.route('/home')
 def home():
-    """Dashboard principal."""
+    """Renderiza a dashboard principal."""
     return render_template('dashboard.html')
 
 @app.route('/vagas')
 def vagas():
     """Renderiza a página de vagas."""
-    return render_template('vagas.html')
+    # Busca vagas do banco de dados e as passa para o template
+    db = get_vagas_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM vagas ORDER BY id DESC')
+    vagas_db = cursor.fetchall()
+    db.close()
+    vagas_list = [dict(v) for v in vagas_db] # Converte para lista de dicionários
+    return render_template('vagas.html', vagas=vagas_list)
 
 @app.route('/candidatos_ranqueados')
 def candidatos_ranqueados():
@@ -304,6 +370,47 @@ def agendar_entrevista_page():
 
 # --- Rotas de Ações (APIs para o Frontend) ---
 
+# API para criar vaga
+@app.route('/api/vagas', methods=['POST'])
+def api_criar_vaga():
+    """API para criar uma nova vaga."""
+    data = request.get_json()
+    nome = data.get('nome')
+    requisitos = data.get('requisitos')
+    if not nome or not requisitos:
+        return jsonify({'success': False, 'message': 'Nome e requisitos obrigatórios.'}), 400
+    db = get_vagas_db()
+    cursor = db.cursor()
+    cursor.execute('INSERT INTO vagas (nome, requisitos) VALUES (?, ?)', (nome, requisitos))
+    db.commit()
+    vaga_id = cursor.lastrowid
+    db.close()
+    return jsonify({'success': True, 'id': vaga_id, 'nome': nome, 'requisitos': requisitos})
+
+# API para listar vagas
+@app.route('/api/vagas', methods=['GET'])
+def api_listar_vagas():
+    """API para listar todas as vagas."""
+    db = get_vagas_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM vagas ORDER BY id DESC')
+    vagas_db = cursor.fetchall()
+    db.close()
+    vagas_list = [dict(v) for v in vagas_db]
+    return jsonify({'success': True, 'vagas': vagas_list})
+
+# API para excluir vaga
+@app.route('/api/vagas/<int:vaga_id>', methods=['DELETE'])
+def api_excluir_vaga(vaga_id):
+    """API para excluir uma vaga."""
+    db = get_vagas_db()
+    cursor = db.cursor()
+    cursor.execute('DELETE FROM vagas WHERE id = ?', (vaga_id,))
+    db.commit()
+    db.close()
+    return jsonify({'success': True, 'message': 'Vaga excluída.'})
+
+
 @app.route('/reprove_candidate/<int:candidate_id>', methods=['POST'])
 def reprove_candidate(candidate_id):
     """
@@ -315,7 +422,6 @@ def reprove_candidate(candidate_id):
     try:
         cursor.execute("UPDATE candidatos SET status = 'reprovado' WHERE id = ?", (candidate_id,))
         db.commit()
-        # Não usa flash aqui diretamente, a mensagem é para o JS que fez a requisição
         return jsonify({'success': True, 'message': 'Candidato reprovado com sucesso!'})
     except Exception as e:
         db.rollback()
@@ -335,7 +441,6 @@ def delete_candidate(candidate_id):
     try:
         cursor.execute("DELETE FROM candidatos WHERE id = ?", (candidate_id,))
         db.commit()
-        # Não usa flash aqui diretamente
         return jsonify({'success': True, 'message': 'Candidato excluído com sucesso!'})
     except Exception as e:
         db.rollback()
@@ -357,7 +462,9 @@ def export_candidatos_completo_csv():
     candidatos = cursor.fetchall()
     db.close()
 
-    si = StringIO()
+    # Inicialize a variável StringIO aqui
+    from io import StringIO  # Certifique-se de importar StringIO
+    si = StringIO()  # Inicializando a variável StringIO corretamente
     writer = csv.writer(si)
     
     # Cabeçalhos do CSV
@@ -417,6 +524,7 @@ def export_candidatos_completo_csv():
         mimetype='text/csv',
         headers={"Content-Disposition": "attachment;filename=candidatos_completo.csv"}
     )
+
 
 @app.route('/export_candidatos_completo_excel')
 def export_candidatos_completo_excel():
@@ -535,11 +643,12 @@ def export_aprovados_excel():
             arquivo_original_hash,
             arquivo_processado
         ])
-    from tempfile import NamedTemporaryFile
-    tmp = NamedTemporaryFile(delete=False, suffix='.xlsx')
-    wb.save(tmp.name)
-    tmp.close()
-    return send_file(tmp.name, as_attachment=True, download_name='candidatos_aprovados.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    output = si.getvalue()
+    return app.response_class(
+        output,
+        mimetype='text/csv',
+        headers={"Content-Disposition": "attachment;filename=candidatos_aprovados.csv"}
+    )
 
 # --- Inicialização do Servidor Flask ---
 if __name__ == '__main__':

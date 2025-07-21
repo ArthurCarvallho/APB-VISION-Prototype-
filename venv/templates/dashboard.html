@@ -72,7 +72,7 @@
         </nav>
         <div class="user-info">
             <img src="{{ url_for('static', filename='images/user_profile.jpg') }}" alt="Foto de perfil">
-            <span>Olá, Ana!</span>
+            <span id="user-nome">Olá, Usuário!</span>
         </div>
     </div>
 
@@ -131,5 +131,12 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+// Preencher nome do usuário autenticado
+let nome = localStorage.getItem('user_nome');
+if (nome) {
+    document.getElementById('user-nome').textContent = `Olá, ${nome}!`;
+}
+</script>
 </body>
 </html>

@@ -39,4 +39,59 @@
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
+<script>
+// Login
+const loginForm = document.getElementById('loginForm');
+const btnLogin = document.getElementById('btnLogin');
+loginForm.onsubmit = async function(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('password').value.trim();
+    btnLogin.disabled = true;
+    btnLogin.textContent = 'Entrando...';
+    const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+    });
+    const data = await res.json();
+    btnLogin.disabled = false;
+    btnLogin.textContent = 'Entrar';
+    if (data.success) {
+        localStorage.setItem('user_nome', data.nome);
+        localStorage.setItem('user_email', data.email);
+        window.location.href = '/home';
+    } else {
+        alert(data.message || 'Login inválido.');
+    }
+};
+
+// Cadastro
+const links = document.querySelectorAll('.links-login a');
+links.forEach(link => {
+    if (link.textContent.includes('Cadastre-se')) {
+        link.onclick = function(e) {
+            e.preventDefault();
+            const nome = prompt('Nome:');
+            const email = prompt('Email:');
+            const senha = prompt('Senha:');
+            if (nome && email && senha) {
+                fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, email, senha })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Conta criada! Faça login.');
+                    } else {
+                        alert(data.message || 'Erro ao cadastrar.');
+                    }
+                });
+            }
+        };
+    }
+});
+</script>
 </html>

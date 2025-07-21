@@ -1,3 +1,7 @@
+let nome = localStorage.getItem('user_nome');
+if (nome) {
+    document.getElementById('user-nome').textContent = `Olá, ${nome}!`;
+}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>

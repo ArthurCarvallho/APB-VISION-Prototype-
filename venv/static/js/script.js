@@ -1,33 +1,65 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Estas são variáveis que podem ser usadas em múltiplas lógicas, se necessário.
-    // Defina-as aqui no escopo global do DOMContentLoaded.
+    // Variáveis globais para o modal de opções de candidato (usadas na página de resultados)
     const modal = document.getElementById('candidateOptionsModal');
     const modalCandidateName = document.getElementById('modalCandidateName');
     const btnReproveCandidate = document.getElementById('btnReproveCandidate');
     const btnDeleteCandidate = document.getElementById('btnDeleteCandidate');
     const btnCancelOption = document.getElementById('btnCancelOption');
-    const closeButton = modal ? modal.getElementsByClassName('close-button')[0] : null;
+    const closeButton = modal ? modal.getElementsByClassName('close-button')[0] : null; // Close button do modal
 
-    let currentCandidateId = null; // Usada para armazenar o ID do candidato clicado no modal
+    let currentCandidateId = null; // Para armazenar o ID do candidato do modal
 
-
-    // --- Lógica para a página de Login (presente apenas em login.html) ---
+    // --- Lógica para a página de Login (login.html) ---
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
-        loginForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // Impede o envio padrão do formulário
-            alert('Login simulado com sucesso!');
-            window.location.href = '/home'; // Redireciona para a rota '/home' do Flask
+        loginForm.addEventListener('submit', async (event) => { // Adicionado 'async'
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, senha: password })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    alert('Login bem-sucedido!');
+                    // Salvar nome do usuário para exibir em outras páginas
+                    localStorage.setItem('user_nome', data.nome);
+                    window.location.href = '/home'; // Redireciona para a home
+                } else {
+                    alert(data.message || 'Erro de login.');
+                }
+            } catch (error) {
+                console.error("Erro na requisição de login:", error);
+                alert('Erro na comunicação com o servidor. Tente novamente.');
+            }
         });
     }
 
-    // --- Lógica para a Dashboard (presente apenas em dashboard.html) ---
-    const btnIniciarTriagemDashboard = document.getElementById("btnIniciarTriagem");
-    const dashboardContainer = document.querySelector('.dashboard-container'); // O novo container da dashboard
+    // Preencher nome do usuário autenticado (se existir em qualquer página)
+    const userNomeSpan = document.getElementById('user-nome');
+    if (userNomeSpan) {
+        const nomeUsuario = localStorage.getItem('user_nome');
+        if (nomeUsuario) {
+            userNomeSpan.textContent = `Olá, ${nomeUsuario}!`;
+        } else {
+            userNomeSpan.textContent = `Olá, Usuário!`; // Fallback
+        }
+    }
 
-    if (btnIniciarTriagemDashboard) { // Botão principal do card de ação
+
+    // --- Lógica para a Dashboard (dashboard.html) ---
+    const btnIniciarTriagemDashboard = document.getElementById("btnIniciarTriagem");
+    const dashboardContainer = document.querySelector('.dashboard-container');
+
+    if (btnIniciarTriagemDashboard) {
         btnIniciarTriagemDashboard.addEventListener('click', () => {
-            window.location.href = "/upload_curriculos"; // Redireciona para a página de upload
+            window.location.href = "/upload_curriculos";
         });
     }
 
@@ -39,14 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return await res.json();
             } catch (error) {
                 console.error("Erro ao buscar dados do dashboard:", error);
-                return null; // Retorna nulo em caso de erro
+                return null;
             }
         }
 
         function renderCharts(data) {
-            if (!data) return; // Não renderiza se não houver dados
+            if (!data) return;
 
-            // KPIs
             document.getElementById('totalCandidatos').textContent = data.pontuacoes ? data.pontuacoes.length : 0;
             const media = (data.pontuacoes && data.pontuacoes.length) ? (data.pontuacoes.reduce((a, b) => a + b, 0) / data.pontuacoes.length).toFixed(1) : 0;
             document.getElementById('mediaPontuacao').textContent = media;
@@ -58,18 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 topHabilidadesList.innerHTML = habilidadesArr.map(([h, v]) => `<li>${h} <span style='color:#0077ff;font-weight:bold;'>(${v})</span></li>`).join('');
             }
 
-            // Gráficos (Só renderiza se o canvas existir)
             if (document.getElementById('pontuacaoChart')) {
                 new Chart(document.getElementById('pontuacaoChart'), {
                     type: 'bar',
-                    data: {
-                        labels: data.pontuacoes ? data.pontuacoes.map((_, i) => `Candidato ${i + 1}`) : [],
-                        datasets: [{
-                            label: 'Pontuação',
-                            data: data.pontuacoes || [],
-                            backgroundColor: 'rgba(0, 123, 255, 0.7)'
-                        }]
-                    },
+                    data: { labels: data.pontuacoes ? data.pontuacoes.map((_, i) => `Candidato ${i + 1}`) : [], datasets: [{ label: 'Pontuação', data: data.pontuacoes || [], backgroundColor: 'rgba(0, 123, 255, 0.7)' }] },
                     options: { responsive: true, plugins: { legend: { display: false } }, animation: { duration: 1200 } }
                 });
             }
@@ -78,56 +101,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 const hist = bins.map((b, i) => (data.pontuacoes || []).filter(p => p >= (bins[i - 1] || 0) && p <= b).length);
                 new Chart(document.getElementById('histogramaChart'), {
                     type: 'bar',
-                    data: {
-                        labels: bins.map((b, i) => i === 0 ? `0-${b}` : `${bins[i - 1] + 1}-${b}`),
-                        datasets: [{
-                            label: 'Distribuição',
-                            data: hist,
-                            backgroundColor: 'rgba(40,167,69,0.7)'
-                        }]
-                    },
+                    data: { labels: bins.map((b, i) => i === 0 ? `0-${b}` : `${bins[i - 1] + 1}-${b}`), datasets: [{ label: 'Distribuição', data: hist, backgroundColor: 'rgba(40,167,69,0.7)' }] },
                     options: { responsive: true, plugins: { legend: { display: false } }, animation: { duration: 1200 } }
                 });
             }
             if (document.getElementById('habilidadesChart')) {
                 new Chart(document.getElementById('habilidadesChart'), {
                     type: 'doughnut',
-                    data: {
-                        labels: data.habilidades ? Object.keys(data.habilidades) : [],
-                        datasets: [{
-                            label: 'Habilidades',
-                            data: data.habilidades ? Object.values(data.habilidades) : [],
-                            backgroundColor: ['#007bff', '#28a745', '#ffc107', '#17a2b8', '#6610f2', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#343a40']
-                        }]
-                    },
+                    data: { labels: data.habilidades ? Object.keys(data.habilidades) : [], datasets: [{ label: 'Habilidades', data: data.habilidades ? Object.values(data.habilidades) : [], backgroundColor: ['#007bff', '#28a745', '#ffc107', '#17a2b8', '#6610f2', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#343a40'] }] },
                     options: { responsive: true, animation: { animateScale: true } }
                 });
             }
             if (document.getElementById('formacaoChart')) {
                 new Chart(document.getElementById('formacaoChart'), {
                     type: 'pie',
-                    data: {
-                        labels: data.formacoes ? Object.keys(data.formacoes) : [],
-                        datasets: [{
-                            label: 'Formações',
-                            data: data.formacoes ? Object.values(data.formacoes) : [],
-                            backgroundColor: ['#17a2b8', '#6610f2', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#343a40', '#007bff', '#28a745', '#ffc107']
-                        }]
-                    },
+                    data: { labels: data.formacoes ? Object.keys(data.formacoes) : [], datasets: [{ label: 'Formações', data: data.formacoes ? Object.values(data.formacoes) : [], backgroundColor: ['#17a2b8', '#6610f2', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#343a40', '#007bff', '#28a745', '#ffc107'] }] },
                     options: { responsive: true, animation: { animateScale: true } }
                 });
             }
             if (document.getElementById('idiomasChart')) {
                 new Chart(document.getElementById('idiomasChart'), {
                     type: 'polarArea',
-                    data: {
-                        labels: data.idiomas ? Object.keys(data.idiomas) : [],
-                        datasets: [{
-                            label: 'Idiomas',
-                            data: data.idiomas ? Object.values(data.idiomas) : [],
-                            backgroundColor: ['#ffc107', '#17a2b8', '#6610f2', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#343a40', '#007bff', '#28a745']
-                        }]
-                    },
+                    data: { labels: data.idiomas ? Object.keys(data.idiomas) : [], datasets: [{ label: 'Idiomas', data: data.idiomas ? Object.values(data.idiomas) : [], backgroundColor: ['#ffc107', '#17a2b8', '#6610f2', '#fd7e14', '#6f42c1', '#e83e8c', '#20c997', '#343a40', '#007bff', '#28a745'] }] },
                     options: { responsive: true, animation: { animateRotate: true } }
                 });
             }
@@ -136,72 +131,93 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // --- Lógica para a página de Upload de Currículos (presente apenas em upload.html) ---
-    const btnSelecionarArquivos = document.getElementById('btnSelecionarArquivos');
-    const arquivoInput = document.getElementById('arquivo');
-    const dragDropArea = document.getElementById('dragDropArea');
-    const btnVoltarUpload = document.getElementById('btnVoltarUpload');
-    const btnIniciarTriagemUpload = document.getElementById('btnIniciarTriagemUpload');
+    // --- Lógica para a página de Upload de Currículos (upload.html) ---
+    // Variáveis renomeadas para evitar conflitos e IDs de elementos
+    const uploadBtnSelecionarArquivos = document.getElementById('btnSelecionarArquivos');
+    const uploadArquivoInput = document.getElementById('arquivo');
+    const uploadDragDropArea = document.getElementById('dragDropArea');
+    const uploadBtnVoltarUpload = document.getElementById('btnVoltarUpload');
+    const uploadBtnIniciarTriagemUpload = document.getElementById('btnIniciarTriagemUpload');
+    const uploadArquivosSelecionadosDisplay = document.getElementById('arquivosSelecionados'); // O p#arquivosSelecionados
 
-    if (btnSelecionarArquivos && arquivoInput && dragDropArea && btnVoltarUpload && btnIniciarTriagemUpload) {
-        btnSelecionarArquivos.addEventListener('click', () => {
-            arquivoInput.click();
+    if (uploadBtnSelecionarArquivos && uploadArquivoInput && uploadDragDropArea && uploadBtnVoltarUpload && uploadBtnIniciarTriagemUpload && uploadArquivosSelecionadosDisplay) {
+        uploadBtnSelecionarArquivos.addEventListener('click', () => {
+            uploadArquivoInput.click();
         });
 
-        arquivoInput.addEventListener('change', () => {
-            if (arquivoInput.files.length > 0) {
-                const fileNames = Array.from(arquivoInput.files).map(file => file.name).join(', ');
-                alert(`Arquivo(s) selecionado(s): ${arquivoInput.files.length} - ${fileNames}`);
+        uploadArquivoInput.addEventListener('change', () => {
+            if (uploadArquivoInput.files.length > 0) {
+                const fileNames = Array.from(uploadArquivoInput.files).map(file => file.name).join(', ');
+                uploadArquivosSelecionadosDisplay.textContent = `Selecionado: ${uploadArquivoInput.files.length} arquivo(s) (${fileNames})`;
+            } else {
+                uploadArquivosSelecionadosDisplay.textContent = 'Arraste e solte os arquivos aqui';
             }
         });
 
+        // Funções auxiliares para Drag and Drop (declaradas dentro do if para escopo local)
         function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-        function highlight() { dragDropArea.classList.add('highlight'); }
-        function unhighlight() { dragDropArea.classList.remove('highlight'); }
+        function highlight() { uploadDragDropArea.classList.add('highlight'); }
+        function unhighlight() { uploadDragDropArea.classList.remove('highlight'); }
         function handleDrop(e) {
             const dt = e.dataTransfer;
             const files = dt.files;
-            arquivoInput.files = files;
-            const fileNames = Array.from(arquivoInput.files).map(file => file.name).join(', ');
-            alert(`Arquivo(s) solto(s): ${files.length} - ${fileNames}`);
+            uploadArquivoInput.files = files; // Atribui os arquivos soltos ao input
+            if (files.length > 0) {
+                const fileNames = Array.from(files).map(file => file.name).join(', ');
+                uploadArquivosSelecionadosDisplay.textContent = `Solto(s): ${files.length} arquivo(s) (${fileNames})`;
+            } else {
+                uploadArquivosSelecionadosDisplay.textContent = 'Arraste e solte os arquivos aqui';
+            }
         }
 
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dragDropArea.addEventListener(eventName, preventDefaults, false);
+            uploadDragDropArea.addEventListener(eventName, preventDefaults, false);
         });
-        ['dragenter', 'dragover'].forEach(eventName => { dragDropArea.addEventListener(eventName, highlight, false); });
-        ['dragleave', 'drop'].forEach(eventName => { dragDropArea.addEventListener(eventName, unhighlight, false); });
-        dragDropArea.addEventListener('drop', handleDrop, false);
+        ['dragenter', 'dragover'].forEach(eventName => { uploadDragDropArea.addEventListener(eventName, highlight, false); });
+        ['dragleave', 'drop'].forEach(eventName => { uploadDragDropArea.addEventListener(eventName, unhighlight, false); });
+        uploadDragDropArea.addEventListener('drop', handleDrop, false);
 
-        btnVoltarUpload.addEventListener('click', () => {
+        uploadBtnVoltarUpload.addEventListener('click', () => {
             window.location.href = "/home";
         });
 
-        btnIniciarTriagemUpload.addEventListener('click', () => {
-            if (arquivoInput.files.length > 0) {
-                const files = arquivoInput.files;
-                const formData = new FormData();
-                for (let i = 0; i < files.length; i++) {
-                    formData.append("arquivos[]", files[i]);
-                }
-                fetch("/upload_multiple_files", {
+        uploadBtnIniciarTriagemUpload.addEventListener('click', async () => {
+            if (uploadArquivoInput.files.length === 0) {
+                alert("Por favor, selecione ou arraste arquivo(s) para iniciar a triagem.");
+                return;
+            }
+            const files = uploadArquivoInput.files;
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append("arquivos[]", files[i]); // Chave CORRETA para o Flask
+            }
+            try {
+                const res = await fetch("/upload_multiple_files", {
                     method: "POST",
                     body: formData
-                })
-                .then(response => {
-                    if (!response.ok) { throw new Error('Falha no upload dos arquivos.'); }
-                    return response.text();
-                })
-                .then(data => {
-                    console.log("Upload bem-sucedido:", data);
-                    window.location.href = "/processando_curriculos";
-                })
-                .catch(error => {
-                    console.error("Erro ao fazer upload dos arquivos:", error);
-                    alert("Erro ao fazer upload dos arquivos. Verifique o console para mais detalhes.");
                 });
-            } else {
-                alert("Por favor, selecione ou arraste arquivo(s) para iniciar a triagem.");
+                if (!res.ok) { // Se a resposta não for OK (status 2xx)
+                    const errorText = await res.text(); // Tenta pegar o texto do erro
+                    // Erro 404 (Not Found) indica rota não encontrada no backend
+                    if (res.status === 404) {
+                        throw new Error(`Rota de upload não encontrada: ${res.url}. Verifique seu app.py.`);
+                    }
+                    // Erro 400 (Bad Request) indica que o backend não gostou dos dados enviados
+                    if (res.status === 400) {
+                        let msg = `Dados inválidos enviados. Detalhes: ${errorText}.`;
+                        if (errorText.includes("files")) { // Se a mensagem do Flask mencionar "files", pode ser nome de campo
+                            msg += " Verifique se o backend espera 'arquivos[]' ou 'files'.";
+                        }
+                        throw new Error(msg);
+                    }
+                    throw new Error(`Falha no upload dos arquivos: ${res.status} ${res.statusText} - ${errorText}`);
+                }
+                const data = await res.text(); // Supondo que o Flask retorna texto simples
+                console.log("Upload bem-sucedido:", data);
+                window.location.href = "/processando_curriculos"; // Redireciona para a tela de processamento
+            } catch (error) {
+                console.error("Erro ao fazer upload dos arquivos:", error);
+                alert(`Erro ao fazer upload dos arquivos. Detalhes: ${error.message}. Verifique o console.`);
             }
         });
     }
@@ -234,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Funções internas para renderizar, filtrar e ordenar (declaradas DENTRO deste if)
         function renderCandidates(candidatesToRender) {
             candidateList.innerHTML = '';
-            if (!Array.isArray(candidatesToRender) || candidatesToRender.length === 0) { // Adicionado verificação de array
+            if (!Array.isArray(candidatesToRender) || candidatesToRender.length === 0) {
                 candidateList.innerHTML = '<p style="text-align: center; margin-top: 30px;">Nenhum candidato encontrado.</p>';
                 return;
             }
@@ -270,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // Adiciona event listener para o botão de adicionar contato (agendar entrevista)
-            document.querySelectorAll('.btn-add').forEach(button => { // Usar document.querySelectorAll aqui
+            document.querySelectorAll('.btn-add').forEach(button => {
                 button.addEventListener('click', (event) => {
                     const candidateItemElement = event.target.closest('.candidate-item');
                     const candidateId = candidateItemElement.querySelector('.btn-ver-detalhes').dataset.id;
@@ -305,14 +321,13 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCandidates(filtered);
         }
 
-        // Event Listeners para busca e ordenação (dentro deste if)
-        if (searchCandidate) { // Adicionado verificação
+        if (searchCandidate) {
             searchCandidate.addEventListener('input', filterAndSortCandidates);
         }
-        if (sortOrder) { // Adicionado verificação
+        if (sortOrder) {
             sortOrder.addEventListener('change', filterAndSortCandidates);
         }
-        filterAndSortCandidates(); // Renderiza na carga da página (chamada inicial DENTRO deste if)
+        filterAndSortCandidates(); // Renderiza na carga da página
 
         if (modal) { // Lógica do Modal (verificando existência)
             if (closeButton) closeButton.onclick = function() { modal.style.display = 'none'; };
@@ -364,11 +379,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Lógica para a página de Detalhes do Candidato (candidate_details.html)
     const dynamicCandidateNameSpan = document.getElementById('dynamicCandidateName');
-    let candidateDataDetailsPage = {}; // Renomeado para evitar conflito com 'candidateData' global, se houver
+    let candidateDataDetailsPage = {};
 
-    // Verifica se estamos na página de detalhes E se a variável global de detalhes existe
     if (dynamicCandidateNameSpan && window.FLASK_CANDIDATE_DETAILS_DATA) {
-        candidateDataDetailsPage = window.FLASK_CANDIDATE_DETAILS_DATA; // Pega os dados da global
+        candidateDataDetailsPage = window.FLASK_CANDIDATE_DETAILS_DATA;
 
         const tabButtons = document.querySelectorAll('.tabs-navigation .tab-btn');
         const tabContents = document.querySelectorAll('.tab-content');
@@ -383,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        if (candidateDataDetailsPage) { // Usa a variável renomeada
+        if (candidateDataDetailsPage) {
             document.getElementById('candidateNameTitle').innerText = `DETALHES DO CANDIDATO: ${candidateDataDetailsPage.nome ? candidateDataDetailsPage.nome.toUpperCase() : 'NOME INDISPONÍVEL'}`;
             document.getElementById('candidateAge').innerText = candidateDataDetailsPage.idade || '--';
             document.getElementById('candidateDesiredRole').innerText = candidateDataDetailsPage.cargo_desejado || '--';
@@ -414,19 +428,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const reasonsList = document.querySelector('#tabPontuacao .reasons-list');
             if (reasonsList) {
                 reasonsList.innerHTML = '';
+                // Preferir 'motivos_pontuacao' do DB, que é a análise IA ou a lista de motivos formatada
                 if (candidateDataDetailsPage.motivos_pontuacao && candidateDataDetailsPage.motivos_pontuacao.length > 0) {
                     candidateDataDetailsPage.motivos_pontuacao.forEach(reason => {
                         const li = document.createElement('li');
                         li.innerText = reason;
                         reasonsList.appendChild(li);
                     });
-                } else if (candidateDataDetailsPage.motivosPontuacao && candidateDataDetailsPage.motivosPontuacao.length > 0) { // Fallback para nome antigo
-                    candidateDataDetailsPage.motivosPontuacao.forEach(reason => {
-                        const li = document.createElement('li');
-                        li.innerText = reason;
-                        reasonsList.appendChild(li);
-                    });
-                } else {
+                } else { // Fallback se 'motivos_pontuacao' estiver vazio ou não for array
                     reasonsList.innerHTML = '<li>Nenhum motivo de pontuação detalhado.</li>';
                 }
             }
