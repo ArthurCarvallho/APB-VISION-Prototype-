@@ -45,17 +45,14 @@ if (nome) {
         </div>
 
         <div class="candidate-profile-section">
-            <div class="profile-avatar"></div>
-            <div class="profile-info">
-                <p><strong>Idade:</strong> <span id="candidateAge">{{ candidate.idade | default('--') }}</span></p>
-                <p><strong>Cargo Desejado:</strong> <span id="candidateDesiredRole">{{ candidate.cargo_desejado | default('--') }}</span></p>
-                <p><strong>Último Cargo:</strong> <span id="candidateLastRole">{{ candidate.ultimo_cargo | default('--') }}</span></p>
-                <p><strong>Disponibilidade:</strong> <span id="candidateAvailability">{{ candidate.disponibilidade | default('--') }}</span></p>
-                <p><i class="fas fa-envelope contact-icon"></i> <span id="candidateEmail">{{ candidate.email | default('N/A') }}</span></p>
-                <p><i class="fas fa-phone-alt contact-icon"></i> <span id="candidatePhone">{{ candidate.telefone | default('N/A') }}</span></p>
-                <p><i class="fab fa-linkedin contact-icon"></i> <a href="{{ candidate.linkedin | default('#') }}" target="_blank" id="candidateLinkedin">{{ candidate.linkedin | default('N/A') }}</a></p>
-            </div>
-        </div>
+    <div class="profile-avatar"></div>
+    <div class="profile-info">
+        <p><strong>Idade:</strong> <span id="candidateAge">{{ candidate.idade or '--' }}</span></p>
+        <p><strong>Cargo Desejado:</strong> <span id="candidateDesiredRole">{{ candidate.cargo_desejado or '--' }}</span></p>
+        <p><i class="fas fa-envelope contact-icon"></i> <span id="candidateEmail">{{ candidate.email or 'N/A' }}</span></p>
+        <p><i class="fas fa-phone-alt contact-icon"></i> <span id="candidatePhone">{{ candidate.telefone or 'N/A' }}</span></p>
+    </div>
+</div>
 
         <div class="tabs-navigation">
             <button class="tab-btn active" data-tab="pontuacao">Pontuação</button>
@@ -65,70 +62,41 @@ if (nome) {
             <button class="tab-btn" data-tab="idioma">Idioma</button>
         </div>
 
-        <div class="tab-content active" id="tabPontuacao">
-            <div class="score-overall">
-                Pontuação Geral: <span id="overallScore">{{ candidate.pontuacaoGeral | default(0) }}%</span>
-            </div>
-            <div class="score-details-grid">
-                <div class="score-card">
-                    <p>Fit Técnico</p>
-                    <div class="score-value"><span>{{ candidate.fitTecnico | default(0) }}</span> / 10</div>
-                </div>
-                <div class="score-card">
-                    <p>Experiência relevante</p>
-                    <div class="score-value"><span>{{ candidate.experienciaRelevante | default(0) }}</span> / 10</div>
-                </div>
-                <div class="score-card">
-                    <p>Fit Cultural</p>
-                    <div class="score-value"><span>{{ candidate.fitCultural | default(0) }}</span> / 10</div>
-                </div>
-            </div>
-            <h3>Motivos da Alta Pontuação</h3>
-            <ul class="reasons-list">
-                {% for motivo in candidate.motivos_pontuacao or [] %}
-                    <li>{{ motivo }}</li>
-                {% endfor %}
-            </ul>
-            <br>
-            <h3>Análise da IA (Gemini)</h3>
-            <p id="geminiAnalysisText">{{ candidate.analise_ia | default('Análise não disponível.') }}</p>
-        </div>
-
-        <div class="tab-content" id="tabHabilidades">
-            <h3>Habilidades Chaves Detectadas</h3>
-            <div class="skill-tags">
-                {% for habilidade in candidate.habilidades or [] %}
-                    <span class="skill-tag">{{ habilidade }}</span>
-                {% endfor %}
-            </div>
-        </div>
-
         <div class="tab-content" id="tabExperiencia">
-            <h3>Histórico Profissional</h3>
-            {% for exp in candidate.experiencia or [] %}
-                <div class="experience-item">
-                    <h4>{{ exp.cargo }}</h4>
-                    <p>{{ exp.empresa }}</p>
-                    <p>{{ exp.periodo }}</p>
+    <h3>Histórico Profissional</h3>
+    {% if candidate.experiencia %}
+        {% for exp in candidate.experiencia %}
+            <div class="experience-item">
+                <h4>{{ exp.cargo }}</h4>
+                <p><strong>Empresa:</strong> {{ exp.empresa }} | <strong>Período:</strong> {{ exp.periodo }}</p>
+                {% if exp.atividades %}
                     <ul>
-                        {% for detalhe in exp.detalhes or [] %}
-                            <li>{{ detalhe }}</li>
+                        {% for atividade in exp.atividades %}
+                            <li>{{ atividade }}</li>
                         {% endfor %}
                     </ul>
-                </div>
-            {% endfor %}
-        </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Nenhuma experiência profissional encontrada.</p>
+    {% endif %}
+</div>
 
-        <div class="tab-content" id="tabFormacao">
-            <h3>Formação Acadêmica</h3>
-            {% for formacao in candidate.formacao or [] %}
-                <div class="education-item">
-                    <h4>{{ formacao.curso }}</h4>
-                    <p>{{ formacao.instituicao }}</p>
-                    <p>{{ formacao.periodo }}</p>
-                </div>
-            {% endfor %}
-        </div>
+<div class="tab-content" id="tabFormacao">
+    <h3>Formação Acadêmica</h3>
+    {% if candidate.formacao %}
+        {% for form in candidate.formacao %}
+            <div class="education-item">
+                <h4>{{ form.curso }}</h4>
+                <p><strong>Instituição:</strong> {{ form.instituicao }}</p>
+                <p><strong>Período:</strong> {{ form.periodo }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Nenhuma formação acadêmica encontrada.</p>
+    {% endif %}
+</div>
 
         <div class="tab-content" id="tabIdioma">
             <h3>Idiomas</h3>

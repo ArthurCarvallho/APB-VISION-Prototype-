@@ -13,7 +13,10 @@ if (nome) {
 
     <!-- Dados dos candidatos disponíveis via atributo data-candidates no body -->
 </head>
-<body class="navbar-layout" data-candidates='{{ (candidatos or []) | tojson | safe }}'>
+<body class="navbar-layout">
+    <script>
+        window.FLASK_CANDIDATES_DATA = {{ (candidatos or []) | tojson | safe }};
+    </script>
     <div class="header">
         <div class="logo">
             <img src="{{ url_for('static', filename='img/logo_apb_vision.png') }}" alt="Logo APB Vision" style="height:48px;vertical-align:middle;margin-right:12px;background:transparent;">
@@ -40,17 +43,24 @@ if (nome) {
         </div>
 
         <div class="filter-sort-area">
-            <input type="text" id="searchCandidate" placeholder="Buscar candidato por nome..." class="search-input">
-            <div class="sort-by">
-                <span>Ordenar por:</span>
-                <select id="sortOrder" class="sort-select">
-                    <option value="pontuacao_desc">Pontuação (Maior p/ Menor)</option>
-                    <option value="pontuacao_asc">Pontuação (Menor p/ Maior)</option>
-                    <option value="nome_asc">Nome (A-Z)</option>
-                    <option value="nome_desc">Nome (Z-A)</option>
-                </select>
-            </div>
-        </div>
+    <div class="vaga-selector">
+        <span>Analisando candidatos para a vaga:</span>
+        <select id="vagaSelector" class="sort-select">
+            <option value="geral">Visão Geral (Pontuação Geral)</option>
+            {% for vaga in vagas %}
+                <option value="{{ vaga.id }}">{{ vaga.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <input type="text" id="searchCandidate" placeholder="Buscar candidato..." class="search-input">
+    <div class="sort-by">
+        <span>Ordenar por:</span>
+        <select id="sortOrder" class="sort-select">
+            <option value="pontuacao_desc">Pontuação (Maior p/ Menor)</option>
+            </select>
+    </div>
+</div>
 
         <div class="candidate-list" id="candidateList">
             <!-- Os candidatos serão renderizados dinamicamente via JS -->

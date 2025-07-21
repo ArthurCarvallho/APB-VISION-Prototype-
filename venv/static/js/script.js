@@ -77,11 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function renderCharts(data) {
             if (!data) return;
-
-            document.getElementById('totalCandidatos').textContent = data.pontuacoes ? data.pontuacoes.length : 0;
-            const media = (data.pontuacoes && data.pontuacoes.length) ? (data.pontuacoes.reduce((a, b) => a + b, 0) / data.pontuacoes.length).toFixed(1) : 0;
-            document.getElementById('mediaPontuacao').textContent = media;
-            document.getElementById('totalExperiencias').textContent = data.experiencias || 0;
+// VERSÃO NOVA E CORRETA
+            document.getElementById('totalCandidatos').textContent = data.total_candidatos || 0;
+            document.getElementById('mediaPontuacao').textContent = data.media_pontuacao || 0;
+            document.getElementById('totalExperiencias').textContent = data.total_experiencias || 0;
 
             const topHabilidadesList = document.getElementById('topHabilidades');
             if (topHabilidadesList && data.habilidades) {
@@ -237,145 +236,128 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
-    // --- Lógica para a página de Candidatos Ranqueados (results.html) ---
-    const candidateList = document.getElementById('candidateList');
-    // Usa a variável global FLASK_CANDIDATES_DATA definida no <head> do results.html
-    let realCandidates = Array.isArray(window.FLASK_CANDIDATES_DATA) ? window.FLASK_CANDIDATES_DATA : [];
 
+// --- Lógica para a página de Candidatos Ranqueados (results.html) ---
+const candidateList = document.getElementById('candidateList');
+if (candidateList) {
+    const vagaSelector = document.getElementById('vagaSelector');
+    const modal = document.getElementById('candidateOptionsModal');
+    const modalCandidateName = document.getElementById('modalCandidateName');
+    let currentCandidateId = null; // Armazena o ID do candidato para o modal
 
-    if (candidateList) { // Verifica se estamos na página de resultados
-        const searchCandidate = document.getElementById('searchCandidate');
-        const sortOrder = document.getElementById('sortOrder');
-
-        // Funções internas para renderizar, filtrar e ordenar (declaradas DENTRO deste if)
-        function renderCandidates(candidatesToRender) {
-            candidateList.innerHTML = '';
-            if (!Array.isArray(candidatesToRender) || candidatesToRender.length === 0) {
-                candidateList.innerHTML = '<p style="text-align: center; margin-top: 30px;">Nenhum candidato encontrado.</p>';
-                return;
-            }
-            candidatesToRender.forEach(candidate => {
-                const candidateItem = document.createElement('div');
-                candidateItem.classList.add('candidate-item');
-                candidateItem.innerHTML = `
-                    <span class="candidate-name">${candidate.nome || 'Nome Indisponível'}</span>
-                    <span class="candidate-score">${candidate.pontuacao || 0}%</span>
-                    <div class="candidate-actions">
-                        <button class="btn btn-details btn-ver-detalhes" data-id="${candidate.id}">Ver detalhes</button>
-                        <button class="btn btn-icon btn-add"><i class="fas fa-user-plus"></i></button>
-                        <button class="btn btn-icon btn-remove" data-id="${candidate.id}" data-name="${candidate.nome || 'Candidato'}"><i class="fas fa-times-circle"></i></button>
-                    </div>
-                `;
-                candidateList.appendChild(candidateItem);
-            });
-
-            document.querySelectorAll('.btn-ver-detalhes').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const candidateId = event.target.dataset.id;
-                    window.location.href = `/detalhes_candidato/${candidateId}`;
-                });
-            });
-
-            document.querySelectorAll('.btn-remove').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    currentCandidateId = event.target.closest('button').dataset.id;
-                    const candidateName = event.target.closest('button').dataset.name;
-                    if (modalCandidateName) modalCandidateName.innerText = candidateName;
-                    if (modal) modal.style.display = 'flex';
-                });
-            });
-
-            // Adiciona event listener para o botão de adicionar contato (agendar entrevista)
-            document.querySelectorAll('.btn-add').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const candidateItemElement = event.target.closest('.candidate-item');
-                    const candidateId = candidateItemElement.querySelector('.btn-ver-detalhes').dataset.id;
-                    const candidateName = candidateItemElement.querySelector('.candidate-name').innerText;
-                    
-                    window.location.href = `/agendar_entrevista_page?id=${candidateId}&name=${encodeURIComponent(candidateName)}`;
-                });
-            });
+    // Função para renderizar os candidatos na tela (COM BOTÕES RESTAURADOS)
+    function renderCandidates(candidatesToRender) {
+        candidateList.innerHTML = '';
+        if (!Array.isArray(candidatesToRender) || candidatesToRender.length === 0) {
+            candidateList.innerHTML = '<p style="text-align: center; padding: 20px;">Nenhum candidato encontrado.</p>';
+            return;
         }
+        candidatesToRender.forEach(c => {
+            const score = c.match_score !== undefined ? c.match_score : c.pontuacao;
+            const scoreLabel = c.match_score !== undefined ? '% Match' : '% Geral';
 
-        function filterAndSortCandidates() {
-            let filtered = Array.isArray(realCandidates) ? [...realCandidates] : [];
+            const item = document.createElement('div');
+            item.className = 'candidate-item';
+            // HTML RESTAURADO com todos os botões
+            item.innerHTML = `
+                <span class="candidate-name">${c.nome || 'Nome Indisponível'}</span>
+                <span class="candidate-score">${score}${scoreLabel}</span>
+                <div class="candidate-actions">
+                    <a href="/detalhes_candidato/${c.id}" class="btn btn-primary btn-details">Ver detalhes</a>
+                    <button class="btn-icon btn-add" data-id="${c.id}" data-name="${c.nome || 'Candidato'}" title="Agendar Entrevista">
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                    <button class="btn-icon btn-remove" data-id="${c.id}" data-name="${c.nome || 'Candidato'}" title="Opções">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `;
+            candidateList.appendChild(item);
+        });
+        
+        // Reativa os "escutadores" de eventos para os novos botões
+        addEventListenersToButtons();
+    }
 
-            const searchTerm = searchCandidate && searchCandidate.value ? searchCandidate.value.toLowerCase() : '';
-            if (searchTerm) {
-                filtered = filtered.filter(candidate =>
-                    (candidate.nome && candidate.nome.toLowerCase().includes(searchTerm))
-                );
-            }
+    // Função para adicionar os "escutadores" de eventos aos botões
+    function addEventListenersToButtons() {
+        // Botão de Opções (reprovar/excluir)
+        document.querySelectorAll('.btn-remove').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const btn = e.currentTarget;
+                currentCandidateId = btn.dataset.id;
+                modalCandidateName.textContent = btn.dataset.name;
+                modal.style.display = 'flex';
+            });
+        });
 
-            const sortValue = sortOrder && sortOrder.value ? sortOrder.value : 'pontuacao_desc';
-            if (sortValue === "pontuacao_desc") {
-                filtered.sort((a, b) => (b.pontuacao || 0) - (a.pontuacao || 0));
-            } else if (sortValue === "pontuacao_asc") {
-                filtered.sort((a, b) => (a.pontuacao || 0) - (b.pontuacao || 0));
-            } else if (sortValue === "nome_asc") {
-                filtered.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
-            } else if (sortValue === "nome_desc") {
-                filtered.sort((a, b) => (b.nome || '').localeCompare(a.nome || ''));
-            }
+        // Botão de Agendar Entrevista
+        document.querySelectorAll('.btn-add').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const btn = e.currentTarget;
+                const id = btn.dataset.id;
+                const name = btn.dataset.name;
+                window.location.href = `/agendar_entrevista_page?id=${id}&name=${encodeURIComponent(name)}`;
+            });
+        });
+    }
 
-            renderCandidates(filtered);
+    // Função para buscar e atualizar a lista de candidatos
+    async function atualizarListaPorVaga() {
+        const vagaId = vagaSelector.value;
+        if (vagaId === 'geral') {
+            window.location.href = '/candidatos_ranqueados';
+            return;
         }
-
-        if (searchCandidate) {
-            searchCandidate.addEventListener('input', filterAndSortCandidates);
-        }
-        if (sortOrder) {
-            sortOrder.addEventListener('change', filterAndSortCandidates);
-        }
-        filterAndSortCandidates(); // Renderiza na carga da página
-
-        if (modal) { // Lógica do Modal (verificando existência)
-            if (closeButton) closeButton.onclick = function() { modal.style.display = 'none'; };
-            window.onclick = function(event) {
-                if (event.target == modal) { modal.style.display = 'none'; }
-            };
-            if (btnCancelOption) btnCancelOption.onclick = function() { modal.style.display = 'none'; };
-
-            if (btnReproveCandidate) {
-                btnReproveCandidate.onclick = function() {
-                    if (currentCandidateId) {
-                        fetch(`/reprove_candidate/${currentCandidateId}`, { method: 'POST' })
-                            .then(response => response.json())
-                            .then(data => {
-                                alert(data.message);
-                                modal.style.display = 'none';
-                                window.location.reload();
-                            })
-                            .catch(error => {
-                                console.error('Erro ao reprovar candidato:', error);
-                                alert('Erro ao reprovar candidato.');
-                            });
-                    }
-                };
-            }
-
-            if (btnDeleteCandidate) {
-                btnDeleteCandidate.onclick = function() {
-                    if (currentCandidateId) {
-                        if (confirm('Tem certeza que deseja EXCLUIR este candidato? Esta ação é irreversível.')) {
-                            fetch(`/delete_candidate/${currentCandidateId}`, { method: 'POST' })
-                                .then(response => response.json())
-                                .then(data => {
-                                    alert(data.message);
-                                    modal.style.display = 'none';
-                                    window.location.reload();
-                                })
-                                .catch(error => {
-                                    console.error('Erro ao excluir candidato:', error);
-                                    alert('Erro ao excluir candidato.');
-                                });
-                        }
-                    }
-                };
-            }
+        candidateList.innerHTML = '<p style="text-align: center; padding: 20px;">Calculando "Match"...</p>';
+        try {
+            const res = await fetch(`/candidatos_ranqueados?vaga_id=${vagaId}`);
+            const data = await res.json();
+            renderCandidates(res.ok ? data : []);
+        } catch (error) {
+            console.error('Erro ao atualizar lista de vagas:', error);
+            candidateList.innerHTML = '<p style="text-align: center; padding: 20px; color: red;">Falha ao carregar candidatos.</p>';
         }
     }
 
+    // Lógica do Modal (movida para dentro do if principal)
+    if (modal) {
+        const btnReprove = document.getElementById('btnReproveCandidate');
+        const btnDelete = document.getElementById('btnDeleteCandidate');
+        
+        // Função para fechar o modal
+        const closeModal = () => { modal.style.display = 'none'; };
+        modal.querySelector('.close-button').addEventListener('click', closeModal);
+        document.getElementById('btnCancelOption').addEventListener('click', closeModal);
+
+        // Ações do modal
+        btnReprove.addEventListener('click', () => {
+            fetch(`/reprove_candidate/${currentCandidateId}`, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                    closeModal();
+                    atualizarListaPorVaga(); // Atualiza a lista
+                });
+        });
+        btnDelete.addEventListener('click', () => {
+            if (confirm('Tem certeza? Esta ação é irreversível.')) {
+                fetch(`/delete_candidate/${currentCandidateId}`, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        alert(data.message);
+                        closeModal();
+                        atualizarListaPorVaga(); // Atualiza a lista
+                    });
+            }
+        });
+    }
+
+    // --- INICIALIZAÇÃO ---
+    vagaSelector.addEventListener('change', atualizarListaPorVaga);
+    // Renderiza a lista inicial que veio do Flask
+    renderCandidates(window.FLASK_CANDIDATES_DATA || []);
+}
 
     // Lógica para a página de Detalhes do Candidato (candidate_details.html)
     const dynamicCandidateNameSpan = document.getElementById('dynamicCandidateName');
@@ -565,50 +547,185 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Lógica para a página de Vagas (vagas.html)
-    const jobListContainer = document.getElementById('jobList');
-    if (jobListContainer) {
-        const mockJobs = [
-            { id: 1, title: "Analista de Dados", status: "Ativa", candidatesCount: "52", link: "/candidatos_ranqueados" },
-            { id: 2, title: "Desenvolvedor Python Sênior", status: "Ativa", candidatesCount: "30", link: "/candidatos_ranqueados" },
-            { id: 3, title: "Designer UX/UI", status: "Inativa", candidatesCount: "0", link: "/candidatos_ranqueados" }
-        ];
+// Em script.js (substituir a seção de Vagas)
 
-        function renderJobs(jobsToRender) {
-            jobListContainer.innerHTML = '';
-            jobsToRender.forEach(job => {
-                const jobItem = document.createElement('div');
-                jobItem.classList.add('job-item');
-                jobItem.innerHTML = `
-                    <div class="job-title-status">
-                        <span class="job-title">${job.title}</span>
-                        <div class="job-status-dropdown">
-                            <span class="status-text">${job.status}</span>
-                            <i class="fas fa-chevron-down status-arrow"></i>
+// --- Lógica para a página de Vagas (vagas.html) ---
+const jobListContainer = document.getElementById('jobList');
+if (jobListContainer) {
+    const modal = document.getElementById('modalNovaVaga');
+    const btnOpenModal = document.getElementById('btnCriarNovaVaga');
+    const btnCloseModal = document.getElementById('closeModalNovaVaga');
+    const btnCancelModal = document.getElementById('cancelNovaVaga');
+    const form = document.getElementById('formNovaVaga');
+    const btnSugerirHabilidades = document.getElementById('btnSugerirHabilidades');
+    const vagaRequisitosTextarea = document.getElementById('vagaRequisitos');
+    const habilidadesContainer = document.getElementById('habilidadesSugeridasContainer');
+    const tagsContainer = document.getElementById('tagsContainer');
+
+    // --- FUNÇÕES DE RENDERIZAÇÃO E API ---
+
+    // Função para buscar e exibir as vagas do backend
+    // Em script.js (substituir a função renderVagas)
+
+// Função para buscar e exibir as vagas com o novo layout
+async function renderVagas() {
+    jobListContainer.innerHTML = '<p>Carregando vagas...</p>';
+    try {
+        const res = await fetch('/api/vagas');
+        const data = await res.json();
+        
+        jobListContainer.innerHTML = ''; // Limpa a lista
+        
+        if (data.success && data.vagas.length > 0) {
+            data.vagas.forEach(vaga => {
+                const vagaCard = document.createElement('div');
+                vagaCard.className = 'vaga-card-aprimorado';
+                vagaCard.id = `vaga-${vaga.id}`;
+
+                // Cria as tags de habilidades
+                const habilidadesHTML = vaga.habilidades_chave && vaga.habilidades_chave.length > 0
+                    ? vaga.habilidades_chave.map(h => `<span class="skill-tag">${h}</span>`).join('')
+                    : '<span style="font-style: italic; color: #888;">Nenhuma habilidade-chave definida.</span>';
+
+                vagaCard.innerHTML = `
+                    <div class="vaga-header">
+                        <h4>${vaga.nome}</h4>
+                        <button class="btn btn-danger" onclick="removerVaga(${vaga.id})" title="Excluir vaga" style="padding: 6px 12px; font-size: 0.9em;">Excluir</button>
+                    </div>
+                    <p class="vaga-descricao">${vaga.requisitos}</p>
+                    <div class="vaga-habilidades-container">
+                        <h5>Habilidades-Chave:</h5>
+                        <div class="vaga-habilidades-tags">
+                            ${habilidadesHTML}
                         </div>
                     </div>
-                    <div class="job-details">
-                        <span class="candidate-count">${job.candidatesCount} Candidatos</span>
-                        <a href="${job.link}" class="link-view-candidates" data-job-id="${job.id}">Ver candidatos</a>
-                    </div>
                 `;
-                jobListContainer.appendChild(jobItem);
+                jobListContainer.appendChild(vagaCard);
             });
-
-            document.querySelectorAll('.link-view-candidates').forEach(link => {
-                link.addEventListener('click', (event) => {
-                    const jobId = event.target.dataset.jobId;
-                    console.log(`Ver candidatos para a vaga ID: ${jobId}`);
-                });
-            });
+        } else {
+            jobListContainer.innerHTML = '<p style="text-align:center;color:#888;margin-top:30px;">Nenhuma vaga criada ainda.</p>';
         }
-        renderJobs(mockJobs);
-
-        const btnCriarNovaVaga = document.getElementById('btnCriarNovaVaga');
-        if (btnCriarNovaVaga) {
-            btnCriarNovaVaga.addEventListener('click', () => {
-                alert('Funcionalidade "Criar Nova Vaga" será implementada. Por enquanto, não há rota.');
-            });
-        }
+    } catch (error) {
+        console.error('Erro ao buscar vagas:', error);
+        jobListContainer.innerHTML = '<p style="text-align:center;color:red;margin-top:30px;">Erro ao carregar vagas.</p>';
     }
+}
+
+    // Função para remover uma vaga (será chamada pelo onclick)
+    window.removerVaga = async (id) => {
+        if (!confirm('Tem certeza que deseja excluir esta vaga?')) return;
+
+        try {
+            const res = await fetch(`/api/vagas/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById(`vaga-${id}`).remove();
+                alert('Vaga excluída com sucesso!');
+            } else {
+                alert(data.message || 'Erro ao excluir vaga.');
+            }
+        } catch (error) {
+            console.error('Erro ao remover vaga:', error);
+            alert('Erro de comunicação ao tentar excluir a vaga.');
+        }
+    };
+
+
+    // --- LÓGICA DO MODAL E FORMULÁRIO ---
+
+    // Funções do Modal
+    const openModal = () => {
+        form.reset();
+        tagsContainer.innerHTML = '';
+        habilidadesContainer.style.display = 'none';
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('show'), 10);
+    };
+    const closeModal = () => {
+        modal.classList.remove('show');
+        setTimeout(() => modal.style.display = 'none', 200);
+    };
+
+    btnOpenModal.onclick = openModal;
+    btnCloseModal.onclick = closeModal;
+    btnCancelModal.onclick = closeModal;
+
+    // Lógica para o botão de Sugerir Habilidades
+    btnSugerirHabilidades.addEventListener('click', async () => {
+        const descricao = vagaRequisitosTextarea.value;
+        if (descricao.trim().length < 20) {
+            alert("Por favor, insira uma descrição de vaga com pelo menos 20 caracteres.");
+            return;
+        }
+
+        const spinner = btnSugerirHabilidades.querySelector('.spinner-inline');
+        spinner.style.display = 'inline-block';
+        btnSugerirHabilidades.disabled = true;
+
+        try {
+            const res = await fetch('/api/vagas/sugerir-habilidades', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ descricao })
+            });
+            const data = await res.json();
+            if (data.success) {
+                tagsContainer.innerHTML = ''; // Limpa tags anteriores
+                data.habilidades.forEach(habilidade => {
+                    const tag = document.createElement('div');
+                    tag.className = 'skill-tag-editavel';
+                    tag.innerHTML = `<span>${habilidade}</span><span class="remover-tag" title="Remover">&times;</span>`;
+                    tag.querySelector('.remover-tag').onclick = () => tag.remove();
+                    tagsContainer.appendChild(tag);
+                });
+                habilidadesContainer.style.display = 'block';
+            } else {
+                alert(data.message || "Não foi possível sugerir habilidades.");
+            }
+        } catch (error) {
+            console.error("Erro ao sugerir habilidades:", error);
+            alert("Ocorreu um erro de comunicação.");
+        } finally {
+            spinner.style.display = 'none';
+            btnSugerirHabilidades.disabled = false;
+        }
+    });
+
+    // Lógica para SALVAR a nova vaga (substitui a simulação)
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById('vagaNome').value.trim();
+        const requisitos = vagaRequisitosTextarea.value.trim();
+        
+        const habilidadesTags = tagsContainer.querySelectorAll('.skill-tag-editavel span:first-child');
+        const habilidades_chave = Array.from(habilidadesTags).map(tag => tag.textContent);
+
+        if (!nome || !requisitos) {
+            alert("Nome e descrição da vaga são obrigatórios.");
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/vagas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, requisitos, habilidades_chave })
+            });
+            const data = await res.json();
+            if(data.success) {
+                alert('Vaga criada com sucesso!');
+                closeModal();
+                renderVagas(); // Atualiza a lista de vagas na página!
+            } else {
+                alert(data.message || "Erro ao salvar a vaga.");
+            }
+        } catch (error) {
+            console.error('Erro ao salvar vaga:', error);
+            alert('Erro de comunicação ao tentar salvar a vaga.');
+        }
+    });
+    
+    // --- INICIALIZAÇÃO ---
+    renderVagas(); // Carrega as vagas do banco de dados quando a página é aberta
+}
 });

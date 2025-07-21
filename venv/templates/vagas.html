@@ -56,25 +56,37 @@
 
     <!-- Modal de criação de vaga -->
     <div class="modal" id="modalNovaVaga">
-        <div class="modal-content">
-            <span class="close-button" id="closeModalNovaVaga">&times;</span>
-            <h3>Criar Nova Vaga</h3>
-            <form id="formNovaVaga">
-                <div class="input-group">
-                    <label for="vagaNome">Nome da Vaga</label>
-                    <input type="text" id="vagaNome" name="vagaNome" required>
-                </div>
-                <div class="input-group">
-                    <label for="vagaRequisitos">Requisitos</label>
-                    <textarea id="vagaRequisitos" name="vagaRequisitos" rows="3" required></textarea>
-                </div>
-                <div class="form-actions-bottom">
-                    <button type="button" class="btn btn-secondary" id="cancelNovaVaga">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Vaga</button>
-                </div>
-            </form>
-        </div>
+    <div class="modal-content">
+        <span class="close-button" id="closeModalNovaVaga">&times;</span>
+        <h3>Criar Nova Vaga</h3>
+        <form id="formNovaVaga">
+            <div class="input-group">
+                <label for="vagaNome">Nome da Vaga</label>
+                <input type="text" id="vagaNome" name="vagaNome" required>
+            </div>
+            <div class="input-group">
+                <label for="vagaRequisitos">Descrição e Requisitos</label>
+                <textarea id="vagaRequisitos" name="vagaRequisitos" rows="5" required placeholder="Cole aqui a descrição completa da vaga..."></textarea>
+            </div>
+
+            <button type="button" class="btn btn-secondary" id="btnSugerirHabilidades">
+                <i class="fas fa-magic"></i> Sugerir Habilidades com IA
+                <i class="fas fa-spinner fa-spin spinner-inline" style="display: none;"></i>
+            </button>
+
+            <div id="habilidadesSugeridasContainer" class="habilidades-container" style="display: none;">
+                <label>Habilidades-Chave (edite se necessário):</label>
+                <div id="tagsContainer" class="tags-wrapper">
+                    </div>
+            </div>
+
+            <div class="form-actions-bottom">
+                <button type="button" class="btn btn-secondary" id="cancelNovaVaga">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Vaga</button>
+            </div>
+        </form>
     </div>
+</div>
 
     <script>
     // Integração com backend Flask

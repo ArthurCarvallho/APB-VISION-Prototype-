@@ -605,3 +605,109 @@ h2, h3, h4 {
     .form-actions-bottom { flex-direction: column; align-items: stretch; }
     .job-item, .job-title-status, .job-details { flex-direction: column; align-items: flex-start; }
 }
+
+/* Estilos para o container de habilidades no modal de vagas */
+.habilidades-container {
+    text-align: left;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f7f8fa;
+    border-radius: 8px;
+    border: 1px solid #e0e6ed;
+}
+
+.habilidades-container label {
+    font-weight: 600;
+    color: var(--modern-text-medium);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.tags-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-tag-editavel {
+    display: flex;
+    align-items: center;
+    background-color: var(--modern-primary-blue);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.skill-tag-editavel .remover-tag {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: transform 0.2s;
+}
+
+.skill-tag-editavel .remover-tag:hover {
+    transform: scale(1.2);
+}
+
+.spinner-inline {
+    margin-left: 8px;
+}
+
+/* Em style_moderno.css (adicionar no final) */
+
+/* Estilos para o card de vaga melhorado */
+.vaga-card-aprimorado {
+    background: white;
+    padding: 24px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    text-align: left;
+    border: 1px solid #e0e6ed;
+}
+
+.vaga-card-aprimorado .vaga-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.vaga-card-aprimorado .vaga-header h4 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--modern-primary-blue);
+    margin: 0;
+}
+
+.vaga-card-aprimorado .vaga-descricao {
+    color: #555;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.vaga-card-aprimorado .vaga-habilidades-container h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.vaga-card-aprimorado .vaga-habilidades-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.vaga-card-aprimorado .skill-tag {
+    background-color: #e9f2ff;
+    color: var(--modern-primary-blue);
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
