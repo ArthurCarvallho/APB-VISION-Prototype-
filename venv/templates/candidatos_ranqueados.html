@@ -4,56 +4,59 @@
     <meta charset="UTF-8">
     <title>Candidatos | APB Vision</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style_moderno.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        // Passa os dados iniciais dos candidatos e das vagas do Flask para o JavaScript
+        window.FLASK_CANDIDATES_DATA = {{ (candidatos or []) | tojson | safe }};
+        window.FLASK_VAGAS_DATA = {{ (vagas or []) | tojson | safe }};
+    </script>
 </head>
 <body>
     <div class="header">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='img/logo_apb_vision.png') }}" alt="Logo APB Vision" style="height:48px;vertical-align:middle;margin-right:12px;background:transparent;">
-            <span>APB <span class="logo-vision">Vision</span></span>
-        </div>
+        <div class="logo"><span>APB Vision</span></div>
         <nav class="navbar">
             <ul>
-                <li><a href="/home">Home</a></li>
+                <li><a href="/home">Inicio</a></li>
                 <li><a href="/vagas">Vagas</a></li>
                 <li><a href="/candidatos_ranqueados" class="active">Candidatos</a></li>
-                <li><a href="#">Configurações</a></li>
             </ul>
         </nav>
-        <div class="user-info">
-            <img src="{{ url_for('static', filename='images/user_profile.jpg') }}" alt="Foto de perfil">
-            <span id="user-nome">Olá, Usuário!</span>
+        <div class="user-info"><span id="user-nome"></span></div>
+    </div>
+    <div class="main-content">
+        <h2>Candidatos Ranqueados</h2>
+
+       <div class="filter-sort-area">
+    <div class="vaga-selector">
+        <label for="vagaSelector">Analisando candidatos para a vaga:</label>
+        <select id="vagaSelector">
+            <option value="geral">Visão Geral (Pontuação Geral)</option>
+            {% for vaga in vagas %}
+                <option value="{{ vaga.id }}">{{ vaga.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <a href="{{ url_for('exportar_candidatos_csv') }}" class="btn btn-secondary">
+        <i class="fas fa-file-download"></i> Exportar para CSV
+    </a>
+</div>
+        
+        <div class="candidate-list" id="candidateList">
+            <p style="text-align:center; padding: 20px;">Carregando candidatos...</p>
         </div>
     </div>
-    <div class="main-content content-wrapper">
-        <div class="container-central">
-            <h1 class="dashboard-title">Lista de Candidatos</h1>
-            <ul id="lista-candidatos" class="lista-candidatos"></ul>
+
+    <div id="candidateOptionsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Opções para <span id="modalCandidateName">Candidato</span></h3>
+            <button class="btn modal-option-btn" id="btnReproveCandidate">Reprovar Candidato</button>
+            <button class="btn btn-danger modal-option-btn" id="btnDeleteCandidate">Excluir Candidato</button>
+            <button class="btn btn-secondary modal-option-btn" id="btnCancelOption">Cancelar</button>
         </div>
     </div>
-    <script>
-// Preencher nome do usuário autenticado
-let nome = localStorage.getItem('user_nome');
-if (nome) {
-    document.getElementById('user-nome').textContent = `Olá, ${nome}!`;
-}
-    // Buscar candidatos
-    fetch('/api/candidatos')
-        .then(res => res.json())
-        .then(data => {
-            const ul = document.getElementById('lista-candidatos');
-            ul.innerHTML = '';
-            if (data.length === 0) {
-                ul.innerHTML = '<li style="text-align:center;color:#888;margin-top:30px;">Nenhum candidato encontrado.</li>';
-            } else {
-                data.forEach(c => {
-                    const li = document.createElement('li');
-                    li.textContent = c.nome;
-                    li.style.padding = '10px 0';
-                    li.style.borderBottom = '1px solid #eee';
-                    ul.appendChild(li);
-                });
-            }
-        });
-    </script>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

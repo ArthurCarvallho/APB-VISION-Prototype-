@@ -2,184 +2,66 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APB Vision - Minhas Vagas</title>
+    <title>Minhas Vagas | APB Vision</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style_moderno.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-/* Animação para modal de vaga */
-.modal-content {
-    transition: transform 0.2s, opacity 0.2s;
-    transform: scale(0.95);
-    opacity: 0.7;
-}
-.modal.show .modal-content {
-    transform: scale(1);
-    opacity: 1;
-}
-    </style>
 </head>
 <body class="navbar-layout">
     <div class="header">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='img/logo_apb_vision.png') }}" alt="Logo APB Vision" style="height:48px;vertical-align:middle;margin-right:12px;background:transparent;">
-            <span>APB <span class="logo-vision">Vision</span></span>
-        </div>
+        <div class="logo"><span>APB Vision</span></div>
         <nav class="navbar">
             <ul>
-                <li><a href="/home">Home</a></li>
+                <li><a href="/home">Início</a></li>
                 <li><a href="/vagas" class="active">Vagas</a></li>
                 <li><a href="/candidatos_ranqueados">Candidatos</a></li>
-                <li><a href="#">Configurações</a></li>
             </ul>
         </nav>
-        <div class="user-info">
-            <img src="{{ url_for('static', filename='images/user_profile.jpg') }}" alt="Foto de perfil">
-            <span id="user-nome">Olá, Usuário!</span>
-        </div>
+        <div class="user-info"><span id="user-nome">Olá, Arthur Carvalho!</span></div>
     </div>
 
-    <div class="main-content content-wrapper">
-        <a href="/home" class="back-arrow"><i class="fas fa-arrow-left"></i></a>
-        <h2>Minhas Vagas Ativas</h2>
-
-        <button class="btn btn-primary btn-new-vaga" id="btnCriarNovaVaga">Criar Nova Vaga</button>
-
+    <div class="main-content">
+        <div class="page-header">
+            <h2>Minhas Vagas Ativas</h2>
+            <button class="btn btn-primary" id="btnCriarNovaVaga"><i class="fas fa-plus"></i> Criar Nova Vaga</button>
+        </div>
         <div class="job-list" id="jobList">
-        <div id="loadingVagas" style="display:none;text-align:center;color:#0077ff;margin-top:30px;font-size:1.1rem;">
-            <i class="fas fa-spinner fa-spin"></i> Carregando vagas...
-        </div>
+            </div>
     </div>
+
+    <div class="modal" id="modalNovaVaga">
+        <div class="modal-content">
+            <span class="close-button" id="closeModalNovaVaga">&times;</span>
+            <h3>Criar Nova Vaga</h3>
+            <form id="formNovaVaga" novalidate>
+                <div class="input-group">
+                    <label for="vagaNome">Nome da Vaga</label>
+                    <input type="text" id="vagaNome" required placeholder="Ex: Analista de Dados Pleno">
+                </div>
+                <div class="input-group">
+                    <label for="vagaRequisitos">Descrição e Requisitos</label>
+                    <textarea id="vagaRequisitos" rows="5" required placeholder="Cole aqui a descrição completa da vaga..."></textarea>
+                </div>
+                
+                <div class="habilidades-section">
+                    <label>Habilidades-Chave</label>
+                    <button type="button" class="btn btn-secondary" id="btnSugerirHabilidades">
+                        <i class="fas fa-magic"></i> Sugerir com IA
+                    </button>
+                    <div id="tagsContainer" class="tags-wrapper">
+                        </div>
+                    <div class="manual-skill-add">
+                        <input type="text" id="manualSkillInput" placeholder="Ou digite uma habilidade e tecle Enter...">
+                    </div>
+                </div>
+
+                <div class="form-actions-bottom">
+                    <button type="button" class="btn btn-secondary" id="btnCancelModal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Vaga</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
-    <!-- Modal de criação de vaga -->
-    <div class="modal" id="modalNovaVaga">
-    <div class="modal-content">
-        <span class="close-button" id="closeModalNovaVaga">&times;</span>
-        <h3>Criar Nova Vaga</h3>
-        <form id="formNovaVaga">
-            <div class="input-group">
-                <label for="vagaNome">Nome da Vaga</label>
-                <input type="text" id="vagaNome" name="vagaNome" required>
-            </div>
-            <div class="input-group">
-                <label for="vagaRequisitos">Descrição e Requisitos</label>
-                <textarea id="vagaRequisitos" name="vagaRequisitos" rows="5" required placeholder="Cole aqui a descrição completa da vaga..."></textarea>
-            </div>
-
-            <button type="button" class="btn btn-secondary" id="btnSugerirHabilidades">
-                <i class="fas fa-magic"></i> Sugerir Habilidades com IA
-                <i class="fas fa-spinner fa-spin spinner-inline" style="display: none;"></i>
-            </button>
-
-            <div id="habilidadesSugeridasContainer" class="habilidades-container" style="display: none;">
-                <label>Habilidades-Chave (edite se necessário):</label>
-                <div id="tagsContainer" class="tags-wrapper">
-                    </div>
-            </div>
-
-            <div class="form-actions-bottom">
-                <button type="button" class="btn btn-secondary" id="cancelNovaVaga">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Salvar Vaga</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-    <script>
-    // Integração com backend Flask
-    async function fetchVagas() {
-        const res = await fetch('/api/vagas');
-        const data = await res.json();
-        return data.vagas || [];
-    }
-
-    async function renderVagas() {
-        const jobList = document.getElementById('jobList');
-        const loading = document.getElementById('loadingVagas');
-        jobList.innerHTML = '';
-        loading.style.display = 'block';
-        const vagas = await fetchVagas();
-        loading.style.display = 'none';
-        if (vagas.length === 0) {
-            jobList.innerHTML = '<p style="text-align:center;color:#888;margin-top:30px;">Nenhuma vaga criada ainda.</p>';
-            return;
-        }
-        vagas.forEach((vaga) => {
-            jobList.innerHTML += `
-                <div class="card-action vaga-card" style="margin-bottom:18px;box-shadow:0 2px 12px rgba(0,0,0,0.07);border-radius:12px;padding:18px;background:#fff;transition:box-shadow 0.3s;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-                        <div>
-                            <h4 style="margin-bottom:8px;color:#222;font-size:1.2rem;">${vaga.nome}</h4>
-                            <p style="color:#555;margin-bottom:10px;"><strong>Requisitos:</strong> ${vaga.requisitos}</p>
-                        </div>
-                        <button class="btn btn-danger" onclick="removerVaga(${vaga.id})" title="Excluir vaga" aria-label="Excluir vaga"><i class="fas fa-trash-alt"></i> Excluir</button>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    async function removerVaga(id) {
-        const res = await fetch(`/api/vagas/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-            alert('Vaga excluída com sucesso!');
-        } else {
-            alert('Erro ao excluir vaga.');
-        }
-        renderVagas();
-    }
-
-    // Modal lógica
-    const btnCriarNovaVaga = document.getElementById('btnCriarNovaVaga');
-    const modalNovaVaga = document.getElementById('modalNovaVaga');
-    const closeModalNovaVaga = document.getElementById('closeModalNovaVaga');
-    const cancelNovaVaga = document.getElementById('cancelNovaVaga');
-    const formNovaVaga = document.getElementById('formNovaVaga');
-
-    btnCriarNovaVaga.onclick = () => { modalNovaVaga.style.display = 'flex'; };
-    function fecharModalVaga() {
-        modalNovaVaga.classList.remove('show');
-        setTimeout(() => { modalNovaVaga.style.display = 'none'; }, 200);
-    }
-    closeModalNovaVaga.onclick = fecharModalVaga;
-    cancelNovaVaga.onclick = fecharModalVaga;
-    // Animação de abertura
-    btnCriarNovaVaga.onclick = () => {
-        modalNovaVaga.style.display = 'flex';
-        setTimeout(() => { modalNovaVaga.classList.add('show'); }, 10);
-    };
-
-    formNovaVaga.onsubmit = async function(e) {
-        e.preventDefault();
-        const nome = document.getElementById('vagaNome').value.trim();
-        const requisitos = document.getElementById('vagaRequisitos').value.trim();
-        if (nome && requisitos) {
-            const res = await fetch('/api/vagas', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, requisitos })
-            });
-            if (res.ok) {
-                alert('Vaga criada com sucesso!');
-                renderVagas();
-                fecharModalVaga();
-                formNovaVaga.reset();
-            } else {
-                alert('Erro ao criar vaga.');
-            }
-        }
-    };
-
-    // Inicializa lista
-    // Preencher nome do usuário autenticado
-    const nomeUsuario = localStorage.getItem('user_nome');
-    if (nomeUsuario) {
-        document.getElementById('user-nome').textContent = `Olá, ${nomeUsuario}!`;
-    }
-    renderVagas();
-    </script>
 </body>
 </html>

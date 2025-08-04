@@ -1,664 +1,665 @@
-/* Importação de fontes (ex: Google Fonts) */
+/* ==========================================================================
+   1. Importações e Variáveis Globais
+   ========================================================================== */
+
+/* Importação de fontes */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&display=swap');
+
 :root {
     --color-black: #000;
     --color-white: #fff;
     --color-light-gray: #E0E0E0;
     --color-medium-gray: #A0A0A0;
     --color-dark-gray: #333;
+
     --modern-background: #f7f8fa;
     --modern-card-bg: #fff;
+    --modern-light-bg: #f9fafc;
+    --modern-border-light: #e0e6ed;
+
     --modern-text-dark: #222;
     --modern-text-medium: #555;
+
     --modern-primary-blue: #0077ff;
     --modern-secondary-blue: #00c6ff;
     --modern-danger-red: #dc3545;
     --modern-success-green: #28a745;
-    --modern-light-bg: #f9fafc;
-    --modern-border-light: #e0e6ed;
 }
 
-/* Reset básico para todos os elementos */
+/* ==========================================================================
+   2. Reset Básico e Estilos do Corpo
+   ========================================================================== */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Estilo base do corpo da página para o tema moderno */
 body {
-    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; /* Fonte moderna principal */
-    background: var(--modern-background); /* Fundo claro geral */
-    color: var(--modern-text-dark); /* Cor de texto padrão */
-    line-height: 1.6; /* Espaçamento entre linhas padrão */
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    background: var(--modern-background);
+    color: var(--modern-text-dark);
+    line-height: 1.6;
 }
 
-/* Layout Geral de Páginas com Navbar */
+/* ==========================================================================
+   3. Layout Geral da Página
+   ========================================================================== */
+
 .navbar-layout {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Garante que a página ocupe a altura total da tela */
+    min-height: 100vh;
 }
 
-/* Estilo do cabeçalho da página */
 .header {
-    background: var(--modern-card-bg); /* Fundo branco para o cabeçalho */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04); /* Sombra suave para profundidade */
-    display: flex;
-    align-items: center; /* Alinha itens verticalmente ao centro */
-    justify-content: space-between; /* Distribui itens horizontalmente */
-    padding: 18px 40px; /* Preenchimento interno */
-}
-
-/* Estilo da área do logo no cabeçalho */
-.logo {
-    display: flex;
-    align-items: center;
-    font-size: 2.2rem; /* Tamanho da fonte grande para 'APB' */
-    font-weight: 700;
-    letter-spacing: 2px; /* Espaçamento entre letras */
-    color: var(--modern-text-dark); /* Cor escura para 'APB' */
-    position: relative;
-    font-family: 'Playfair Display', serif; /* Fonte específica para 'APB' */
-}
-/* Estilo da imagem dentro do logo */
-.logo img {
-    height: 48px;
-    margin-right: 12px;
-    vertical-align: middle;
-    background: transparent;
-    border-radius: 0;
-    box-shadow: none;
-}
-/* Estilo da parte 'Vision' do logo */
-.logo .logo-vision {
-    font-size: 1.1rem; /* Tamanho ajustado para 'Vision' */
-    font-weight: 400;
     background: var(--modern-card-bg);
-    color: var(--modern-text-dark);
-    padding: 2px 18px;
-    border-radius: 18px; /* Cantos arredondados para parecer um badge */
-    margin-left: -30px; /* Sobrepõe 'APB' um pouco */
-    margin-top: 18px; /* Ajusta a posição vertical */
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-    font-family: 'Montserrat', sans-serif; /* Fonte principal para 'Vision' */
-}
-
-/* Estilo da barra de navegação principal */
-.navbar {
-    flex: 1; /* Permite que a navbar ocupe o espaço restante */
-    margin-left: 40px;
-}
-.navbar ul {
-    list-style: none; /* Remove marcadores de lista */
-    display: flex;
-    gap: 32px; /* Espaçamento entre os itens */
-    margin: 0;
-    padding: 0;
-}
-.navbar a {
-    text-decoration: none; /* Remove sublinhado dos links */
-    color: var(--modern-text-dark);
-    font-weight: 500;
-    font-size: 1.1rem;
-    transition: color 0.2s; /* Transição suave na cor ao passar o mouse */
-}
-.navbar a.active, .navbar a:hover {
-    color: var(--modern-primary-blue); /* Cor de destaque para link ativo/hover */
-}
-/* Estilo da área de informações do usuário no cabeçalho */
-.user-info {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     display: flex;
     align-items: center;
-    gap: 12px; /* Espaçamento entre imagem e texto */
-}
-.user-info img {
-    height: 38px;
-    width: 38px;
-    border-radius: 50%; /* Imagem de perfil redonda */
-    object-fit: cover;
-    border: 2px solid var(--modern-border-light);
-}
-.user-info span {
-    font-weight: 500;
-    color: var(--modern-text-dark);
+    justify-content: space-between;
+    padding: 18px 40px;
 }
 
-/* Estilo para o conteúdo principal de todas as páginas */
 .main-content {
-    padding: 32px 0; /* Preenchimento superior e inferior */
-    min-height: 80vh; /* Altura mínima */
-    flex-grow: 1; /* Permite que o conteúdo ocupe o espaço disponível */
-    max-width: 1200px; /* Largura máxima do conteúdo */
-    margin: 0 auto; /* Centraliza o conteúdo */
+    padding: 32px 0;
+    flex-grow: 1;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* Estilo da seta de voltar */
+/* Layout específico da dashboard para ser mais largo */
+.main-content.dashboard-page {
+    max-width: 1600px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+/* Cabeçalho de página com seta */
+.page-header-with-arrow {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 24px;
+    margin-left: 20px;
+}
+
 .back-arrow {
     color: var(--modern-primary-blue);
     font-size: 1.5rem;
     text-decoration: none;
-    margin-bottom: 18px;
     display: inline-block;
 }
-/* Estilo para cabeçalhos de página com seta de voltar */
-.page-header-with-arrow {
-    display: flex;
-    align-items: center;
-    gap: 18px; /* Espaçamento entre a seta e o título */
-    margin-bottom: 24px;
-    margin-left: 20px; /* Alinhar com o conteúdo principal */
-}
-.page-header-with-arrow h2 {
-    margin: 0; /* Remove margens padrão do h2 */
-    font-size: 2rem; /* Tamanho do título da página */
-    color: var(--modern-text-dark);
-    text-align: left;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-}
 
-/* --- Estilos de Botões Modernos --- */
-.btn {
-    background: linear-gradient(90deg, var(--modern-primary-blue) 0%, var(--modern-secondary-blue) 100%); /* Gradiente azul */
-    color: var(--color-white);
-    border: none;
-    border-radius: 8px;
-    padding: 12px 28px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07); /* Sombra sutil */
-    transition: background 0.2s, box-shadow 0.2s; /* Transição suave para hover */
-}
-.btn:hover {
-    background: linear-gradient(90deg, #005bb5 0%, #0099cc 100%); /* Gradiente mais escuro no hover */
-    box-shadow: 0 4px 16px rgba(0,0,0,0.10); /* Sombra maior no hover */
-}
+/* ==========================================================================
+   4. Componentes de UI Comuns
+   ========================================================================== */
 
-
-.btn-secondary {
-    background: #e0e6ed; /* Cor de fundo cinza clara */
-    color: var(--modern-text-medium); /* Cor de texto médio */
-    box-shadow: none;
-}
-.btn-secondary:hover {
-    background: #c9d6e4; /* Cor de fundo mais escura no hover */
-    box-shadow: none;
-}
-
-.btn-danger {
-    background-color: var(--modern-danger-red); /* Cor vermelha para ações de perigo */
-    color: var(--color-white);
-}
-.btn-danger:hover {
-    background-color: #c82333; /* Vermelho mais escuro no hover */
-}
-
-
-/* --- Estilos Comuns de Cards/Containers (Login, Dashboard, Upload, Processamento, Agendamento) --- */
-.container-central {
-    max-width: 600px; /* Largura máxima do container central */
-    margin: 0 auto; /* Centraliza horizontalmente */
-    background: var(--modern-card-bg); /* Fundo branco */
-    border-radius: 18px; /* Cantos arredondados */
-    box-shadow: 0 2px 16px rgba(0,0,0,0.07); /* Sombra suave */
-    padding: 32px 40px; /* Preenchimento interno */
-    display: flex; /* Usado para centralizar o conteúdo interno */
-    flex-direction: column;
-    align-items: center; /* Centraliza itens horizontalmente dentro do container */
-}
-
-/* Cards internos (dentro de container-central) */
-.card-action, .card-login, .card-upload, .card-processing, .card-form-interview {
-    background: var(--modern-light-bg); /* Fundo ligeiramente mais escuro para cards internos */
-    border-radius: 12px;
-    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
-    padding: 28px 24px;
-    margin-bottom: 24px;
-    width: 100%; /* Ocupa a largura total do container-central */
-    text-align: center; /* Centraliza o texto */
-}
-
-/* Títulos para cards */
+/* --- Títulos --- */
 h2, h3, h4 {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
     color: var(--modern-text-dark);
 }
 
-/* --- Estilos Específicos das Páginas --- */
-
-/* Login */
-.login-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: var(--modern-background); /* Fundo claro para a página de login */
-}
-.card-login h2 { margin-top: 0; margin-bottom: 30px; font-size: 1.8rem; }
-.card-login .input-group { text-align: left; margin-bottom: 20px; }
-.input-group label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--modern-text-medium); }
-.input-group input[type="email"], .input-group input[type="password"],
-.input-group input[type="text"], .input-group input[type="date"], .input-group input[type="time"],
-.input-group select {
-    width: 100%; padding: 12px 15px; border: 1px solid var(--modern-border-light); border-radius: 8px;
-    font-size: 1em; background-color: var(--color-white); color: var(--modern-text-dark);
-}
-.card-login .btn-primary { width: 100%; margin-top: 20px; }
-.links-login { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
-.links-login a { color: var(--modern-primary-blue); text-decoration: none; font-size: 0.9em; }
-.links-login a:hover { text-decoration: underline; }
-.icon-search-lg { /* Ícone de lupa no login (estilizado para ser um círculo azul) */
-    width: 80px; height: 80px; background-color: var(--modern-primary-blue); border-radius: 50%;
-    margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center;
-    font-size: 3em; color: var(--color-white);
-    /* Se você usar Font Awesome, adicione content: '\f002'; font-family: 'Font Awesome 5 Free'; font-weight: 900; */
+.page-header-with-arrow h2, .dashboard-page h2 {
+    margin: 0;
+    font-size: 2rem;
+    color: var(--modern-text-dark);
+    text-align: left;
+    font-weight: 700;
 }
 
-/* Dashboard */
-.dashboard-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-.dashboard-title { font-size: 2.2rem; margin-bottom: 1.5rem; text-align: center; }
-.kpi-cards-wrapper { /* Novo wrapper para KPIs */
-    display: flex; justify-content: space-around; flex-wrap: wrap; margin-bottom: 2rem; gap: 2rem;
-}
-.kpi-card { /* Card individual de KPI */
-    background: var(--modern-card-bg); border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-    padding: 1.5rem; transition: box-shadow 0.3s; min-width: 220px; text-align: center;
-}
-.kpi-card:hover { box-shadow: 0 4px 32px rgba(0,0,0,0.15); }
-.kpi-card h3 { font-size: 1.2rem; margin-bottom: 0.7rem; color: var(--modern-text-medium); } /* Ajuste de cor */
-.kpi-card .value { font-size: 2.5rem; font-weight: bold; color: var(--modern-primary-blue); }
-.charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
-.chart-card { /* Card para gráficos */
-    background: var(--modern-card-bg); border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-    padding: 1.5rem; transition: box-shadow 0.3s;
-}
-.chart-card:hover { box-shadow: 0 4px 32px rgba(0,0,0,0.15); }
-#topHabilidades { /* Lista Top 5 */
-    font-size: 1.1rem; margin: 0; padding-left: 1.2em; text-align: left; list-style: decimal;
-}
-#topHabilidades li span { color:var(--modern-primary-blue); font-weight:bold; }
-
-
-/* Processamento */
-.card-processing .spinner-icon {
-    font-size: 3.5rem;
-    color: var(--modern-primary-blue);
-    margin-bottom: 18px;
-}
-.progress-bar-container {
-    background: #eee;
-    border-radius: 8px;
-    height: 18px;
-    width: 100%;
-    margin-bottom: 12px;
-}
-.progress-bar {
-    background: linear-gradient(90deg, var(--modern-primary-blue) 0%, var(--modern-secondary-blue) 100%);
-    height: 100%;
-    border-radius: 8px;
-    width: 0%;
-    transition: width 0.5s ease-in-out;
-}
-
-/* Upload */
-.card-upload .vaga-relacionada {
-    background-color: var(--modern-primary-blue);
-    color: var(--color-white);
-    padding: 8px 15px;
-    border-radius: 5px;
-    display: inline-block;
-    margin-bottom: 20px;
-    font-weight: 600;
-    font-size: 1em;
-}
-.drag-drop-area {
-    background: #f0f4fa;
-    border: 2px dashed var(--modern-primary-blue);
-    border-radius: 12px;
-    padding: 32px;
+.dashboard-page h2 {
     text-align: center;
-    margin-bottom: 18px;
-    background-color: var(--modern-card-bg); /* Fundo branco para área de drop */
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-    cursor: pointer;
+    margin-bottom: 2rem;
 }
-.drag-drop-area.highlight {
-    border-color: #005bb5;
-    background-color: #e0e8f0;
-}
-.icon-file {
-    font-size: 3em;
-    color: var(--modern-primary-blue);
-    margin-top: 12px;
-}
-.btn-select-file { width: 80%; padding: 15px; font-size: 1.1em; margin-bottom: 15px; }
-.file-types { font-size: 0.9em; color: var(--modern-text-medium); margin-bottom: 25px; }
-.upload-actions { display: flex; justify-content: space-between; gap: 15px; margin-top: 25px; }
-.upload-actions .btn { flex: 1; padding: 14px; font-size: 1em; }
 
-
-/* Detalhes do Candidato */
-.candidate-details-header {
+/* --- Logo --- */
+.logo {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    padding: 0 20px;
-    flex-wrap: wrap;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--modern-text-dark);
+    position: relative;
+    font-family: 'Playfair Display', serif;
 }
-.candidate-details-header h2 {
-    flex-grow: 1; margin-bottom: 0; font-size: 1.8rem;
-    color: var(--modern-text-dark); /* Consistência de cor */
-}
-.candidate-actions-top {
-    display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end;
-}
-.candidate-actions-top .btn { font-size: 0.85rem; padding: 8px 15px; }
-.candidate-profile-section {
-    display: flex; align-items: flex-start; gap: 30px;
-    background-color: var(--modern-card-bg); padding: 30px; border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 900px; margin: 30px auto;
-}
-.profile-avatar {
-    width: 100px; height: 100px; background-color: #e0e6ed; border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
-    font-size: 4em; color: #8898aa;
-    content: '\f007'; font-family: 'Font Awesome 5 Free'; font-weight: 900;
-}
-.profile-info { flex-grow: 1; line-height: 1.8; }
-.profile-info p { margin-bottom: 5px; font-size: 1em; color: var(--modern-text-dark); }
-.profile-info p strong { color: var(--modern-text-dark); min-width: 120px; display: inline-block; }
-.contact-icon { margin-right: 8px; color: var(--modern-primary-blue); }
-.profile-info a { color: var(--modern-primary-blue); text-decoration: none; }
-.profile-info a:hover { text-decoration: underline; }
 
-/* Abas de Navegação */
+.logo img {
+    height: 48px;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+
+.logo .logo-vision {
+    font-size: 1.1rem;
+    font-weight: 400;
+    background: var(--modern-card-bg);
+    color: var(--modern-text-dark);
+    padding: 2px 18px;
+    border-radius: 18px;
+    margin-left: -30px;
+    margin-top: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* --- Navegação Principal --- */
+.navbar {
+    flex: 1;
+    margin-left: 40px;
+}
+
+.navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 32px;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: var(--modern-text-dark);
+    font-weight: 500;
+    font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.navbar a.active, .navbar a:hover {
+    color: var(--modern-primary-blue);
+}
+
+/* --- Informações do Usuário --- */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-info img {
+    height: 38px;
+    width: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--modern-border-light);
+}
+
+.user-info span {
+    font-weight: 500;
+    color: var(--modern-text-dark);
+}
+
+/* --- Botões --- */
+.btn {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 28px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: background 0.2s, box-shadow 0.2s, background-color 0.2s;
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.25);
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn.btn-primary { /* Estilo padrão do botão principal */
+    background: linear-gradient(90deg, var(--modern-primary-blue) 0%, var(--modern-secondary-blue) 100%);
+    color: var(--color-white);
+}
+
+.btn.btn-primary:hover {
+    background: linear-gradient(90deg, #005bb5 0%, #0099cc 100%);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+.btn-secondary {
+    background: #e0e6ed;
+    color: var(--modern-text-medium);
+    box-shadow: none;
+}
+
+.btn-secondary:hover {
+    background: #c9d6e4;
+    box-shadow: none;
+}
+
+.btn-danger {
+    background: var(--modern-danger-red);
+    color: var(--color-white);
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+/* --- Containers e Cards --- */
+.container-central {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--modern-card-bg);
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    padding: 32px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Cards genéricos para ações dentro de um container */
+.card-action, .card-login, .card-upload, .card-processing, .card-form-interview {
+    background: var(--modern-light-bg);
+    border-radius: 12px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+    padding: 28px 24px;
+    margin-bottom: 24px;
+    width: 100%;
+    text-align: center;
+}
+
+/* --- Formulários --- */
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--modern-text-medium);
+}
+
+.input-group input[type="email"],
+.input-group input[type="password"],
+.input-group input[type="text"],
+.input-group input[type="date"],
+.input-group input[type="time"],
+.input-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--modern-border-light);
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: var(--color-white);
+    color: var(--modern-text-dark);
+}
+
+.form-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 18px;
+}
+
+.form-row .input-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.form-actions-bottom {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.form-actions-bottom .btn {
+    padding: 10px 25px;
+    font-size: 1em;
+}
+
+
+/* --- Abas de Navegação (Tabs) --- */
 .tabs-navigation {
-    display: flex; justify-content: center; margin-top: 30px; margin-bottom: 20px;
-    border-bottom: 2px solid var(--modern-border-light); max-width: 900px;
-    margin-left: auto; margin-right: auto; overflow-x: auto;
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--modern-border-light);
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow-x: auto;
 }
+
 .tabs-navigation .tab-btn {
-    background-color: transparent; border: none; padding: 12px 25px;
-    font-size: 1.05em; font-weight: 600; color: #666; cursor: pointer;
-    transition: color 0.2s ease, border-bottom 0.2s ease; border-bottom: 2px solid transparent;
-    white-space: nowrap; flex-shrink: 0;
+    background-color: transparent;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.05em;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s ease, border-bottom 0.2s ease;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
-.tabs-navigation .tab-btn:hover { color: var(--modern-primary-blue); }
-.tabs-navigation .tab-btn.active { color: var(--modern-primary-blue); border-bottom: 2px solid var(--modern-primary-blue); }
+
+.tabs-navigation .tab-btn:hover {
+    color: var(--modern-primary-blue);
+}
+
+.tabs-navigation .tab-btn.active {
+    color: var(--modern-primary-blue);
+    border-bottom: 2px solid var(--modern-primary-blue);
+}
 
 .tab-content {
-    background-color: var(--modern-card-bg); padding: 30px; border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 900px;
-    margin: 20px auto 40px auto; display: none;
-}
-.tab-content.active { display: block; }
-.tab-content h3 {
-    font-size: 1.4em; margin-bottom: 20px; color: var(--modern-text-dark);
-    border-bottom: 1px solid var(--modern-border-light); padding-bottom: 10px;
-}
-
-/* Pontuação */
-.score-overall {
-    background: linear-gradient(45deg, var(--modern-primary-blue), var(--modern-secondary-blue));
-    color: var(--color-white); padding: 18px 28px; border-radius: 10px;
-    font-size: 1.6em; font-weight: bold; text-align: center;
-    margin-bottom: 30px; max-width: 300px; margin-left: auto; margin-right: auto;
-    box-shadow: 0 4px 12px rgba(0,119,255,0.2);
-}
-.score-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 30px; }
-.score-card {
-    background-color: #f0f4fa; padding: 18px; border-radius: 10px; text-align: center;
-    display: flex; flex-direction: column; justify-content: space-between; align-items: center;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.03);
-}
-.score-card p { font-size: 1em; font-weight: 600; color: #444; margin-bottom: 10px; }
-.score-value { font-size: 2em; font-weight: bold; color: var(--modern-primary-blue); }
-.score-value span { font-size: 1.2em; color: var(--modern-primary-blue); }
-.reasons-list { list-style-type: disc; margin-left: 25px; color: #444; }
-.reasons-list li { margin-bottom: 8px; font-size: 1em; }
-
-/* Análise IA */
-.ai-analysis-panel {
-    background: #f0f4fa;
-    border-left: 6px solid var(--modern-primary-blue); /* Borda lateral para destaque */
+    background-color: var(--modern-card-bg);
+    padding: 30px;
     border-radius: 12px;
-    padding: 24px;
-    margin: 24px 0;
-    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
-}
-.ai-analysis-panel h3 {
-    margin-top: 0; color: var(--modern-primary-blue); display: flex; align-items: center; gap: 10px;
-    border-bottom: none; padding-bottom: 0; font-size: 1.4em;
-}
-.ai-analysis-panel h3 i { font-size: 1.2em; }
-.ai-analysis-panel p { font-size: 1.05rem; line-height: 1.6; color: #333; }
-
-
-/* Habilidades */
-.skill-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
-.skill-tag {
-    background-color: #e0e6ed; color: #444; padding: 8px 15px; border-radius: 20px;
-    font-size: 0.9em; font-weight: 600; transition: background-color 0.2s;
-}
-.skill-tag:hover { background-color: #c9d6e4; }
-
-/* Experiência e Formação */
-.experience-item, .education-item {
-    background-color: #f9fafc; padding: 20px; border-radius: 8px; margin-bottom: 15px;
-    border: 1px solid #eee; box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-}
-.experience-item h4, .education-item h4 { font-size: 1.15em; margin-bottom: 5px; color: #222; }
-.experience-item p, .education-item p { font-size: 0.95em; color: #555; margin-bottom: 8px; }
-.experience-item ul { list-style-type: disc; margin-left: 25px; color: #444; }
-.experience-item ul li { margin-bottom: 5px; }
-
-/* Idiomas */
-.language-list { list-style-type: disc; margin-left: 25px; color: #444; }
-.language-list li { margin-bottom: 8px; font-size: 1em; }
-
-/* Botão de download do currículo */
-.btn-download-cv {
-    display: block; width: fit-content; margin: 40px auto;
-    background-color: var(--modern-primary-blue); color: var(--color-white);
-    padding: 15px 30px; font-size: 1.1em; border-radius: 8px;
-    text-decoration: none; text-align: center;
-    box-shadow: 0 2px 8px rgba(0,119,255,0.2);
-}
-.btn-download-cv:hover {
-    background-color: #005bb5;
-    box-shadow: 0 4px 16px rgba(0,119,255,0.3);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    max-width: 900px;
+    margin: 20px auto 40px auto;
+    display: none;
 }
 
-/* Candidatos Ranqueados */
-.filter-sort-area {
-    display: flex; justify-content: space-between; align-items: center; max-width: 900px;
-    margin: 0 auto 30px auto; padding: 0 20px;
+.tab-content.active {
+    display: block;
 }
-.search-input {
-    flex-grow: 1; padding: 12px 15px; border: 1px solid #ccc; border-radius: 8px;
-    font-size: 1em; background-color: #fff; margin-right: 20px; max-width: 350px;
-    color: #333;
-}
-.sort-by { display: flex; align-items: center; gap: 10px; font-size: 1em; color: #555; }
-.sort-select {
-    padding: 10px 15px; border: 1px solid #ccc; border-radius: 8px;
-    background-color: #fff; font-size: 1em; cursor: pointer; color: #333;
-}
-.candidate-list {
-    max-width: 900px; margin: 0 auto 30px auto; background-color: #fff;
-    border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.05); overflow: hidden;
-}
-.candidate-item {
-    display: flex; justify-content: space-between; align-items: center; padding: 15px 25px;
-    border-bottom: 1px solid #eee; transition: background-color 0.2s;
-}
-.candidate-item:last-child { border-bottom: none; }
-.candidate-item:hover { background-color: #f0f4fa; }
-.candidate-name { font-weight: 600; font-size: 1.1em; flex-grow: 1; color: #222; }
-.candidate-score { font-weight: bold; font-size: 1.1em; color: var(--modern-primary-blue); margin-right: 30px; min-width: 60px; text-align: right; }
-.candidate-actions { display: flex; gap: 10px; align-items: center; }
-.candidate-actions .btn-details {
-    background-color: var(--modern-primary-blue); color: #fff; padding: 8px 15px;
-    font-size: 0.9em; border-radius: 6px; transition: background-color 0.2s;
-}
-.candidate-actions .btn-details:hover { background-color: #005bb5; }
-.candidate-actions .btn-icon {
-    background-color: transparent; border: none; color: #666; font-size: 1.3em;
-    cursor: pointer; padding: 5px; transition: color 0.2s;
-}
-.candidate-actions .btn-icon:hover { color: #000; }
-.candidate-actions .btn-remove { color: var(--modern-danger-red); }
-.candidate-actions .btn-remove:hover { color: #c82333; }
 
-/* Paginação */
-.pagination { display: flex; justify-content: center; align-items: center; margin-top: 30px; gap: 8px; }
-.page-link {
-    display: inline-block; padding: 8px 14px; border: 1px solid #ccc; border-radius: 6px;
-    text-decoration: none; color: #333; background-color: #fff;
-    transition: background-color 0.2s, color 0.2s;
+.tab-content h3 {
+    font-size: 1.4em;
+    margin-bottom: 20px;
+    color: var(--modern-text-dark);
+    border-bottom: 1px solid var(--modern-border-light);
+    padding-bottom: 10px;
 }
-.page-link:hover { background-color: #f0f4fa; color: var(--modern-primary-blue); }
-.page-link.active { background-color: var(--modern-primary-blue); color: #fff; border-color: var(--modern-primary-blue); }
-.page-dots { color: #666; font-weight: bold; }
 
-/* Modal */
+/* --- Modais --- */
 .modal {
-    position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0,0,0,0.5);
-    display: flex; justify-content: center; align-items: center; /* Permite centralizar */
-    /* Este display é definido em JS. Por padrão no CSS, deve ser none! */
-    display: none; /* ESSENCIAL para esconder por padrão */
+    display: none; /* Alterado para 'flex' por JS para exibir */
+    justify-content: center;
+    align-items: center;
 }
+
 .modal-content {
-    background-color: var(--modern-card-bg); padding: 30px; border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2); width: 90%; max-width: 450px;
-    text-align: center; position: relative; color: var(--modern-text-dark);
+    background-color: var(--modern-card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    position: relative;
+    color: var(--modern-text-dark);
 }
+
 .close-button {
-    color: #aaa; float: right; font-size: 28px; font-weight: bold;
-    position: absolute; top: 15px; right: 20px; cursor: pointer;
+    color: #aaa;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
 }
-.close-button:hover, .close-button:focus { color: #000; }
+
+.close-button:hover, .close-button:focus {
+    color: #000;
+}
+
 .modal-content h3 {
-    margin-top: 0; color: var(--modern-text-dark); font-size: 1.6em; margin-bottom: 25px;
+    margin-top: 0;
+    font-size: 1.6em;
+    margin-bottom: 25px;
 }
+
 .modal-option-btn {
-    display: block; width: 90%; margin: 12px auto; padding: 12px 20px;
-    font-size: 1.1em; font-weight: 600; border-radius: 8px; transition: all 0.2s;
+    display: block;
+    width: 90%;
+    margin: 12px auto;
+    padding: 12px 20px;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
 }
+
 .modal-option-btn#btnReproveCandidate {
-    background-color: var(--modern-primary-blue); color: #fff;
+    background-color: var(--modern-primary-blue);
+    color: #fff;
 }
 .modal-option-btn#btnReproveCandidate:hover { background-color: #005bb5; }
+
 .modal-option-btn#btnDeleteCandidate {
-    background-color: var(--modern-danger-red); color: #fff;
+    background-color: var(--modern-danger-red);
+    color: #fff;
 }
 .modal-option-btn#btnDeleteCandidate:hover { background-color: #c82333; }
+
 .modal-option-btn#btnCancelOption {
-    background-color: #f0f0f0; color: #555;
+    background-color: #f0f0f0;
+    color: #555;
 }
 .modal-option-btn#btnCancelOption:hover { background-color: #ddd; }
 
 
-/* Agendamento de Entrevista */
-.card-form-interview {
-    background: var(--modern-light-bg); border-radius: 12px;
-    box-shadow: 0 1px 8px rgba(0,0,0,0.04); padding: 32px 40px;
-    max-width: 700px; width: 100%; margin: 24px auto;
-}
-.form-row { display: flex; gap: 24px; margin-bottom: 18px; }
-.form-row .input-group { flex: 1; margin-bottom: 0; }
-.input-group label { font-weight: 600; color: #444; margin-bottom: 6px; }
-.input-group input[type="date"], .input-group input[type="time"], .input-group select {
-    border: 1px solid #ccc; border-radius: 8px; padding: 10px 14px; width: 100%;
-    background-color: #fff; color: #333;
-}
-.form-actions-bottom { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; }
-.form-actions-bottom .btn { padding: 10px 25px; font-size: 1em; }
-
-/* Responsividade Geral */
-@media (max-width: 768px) {
-    .header { flex-direction: column; text-align: center; padding: 15px 20px; }
-    .navbar { margin-left: 0; margin-top: 15px; }
-    .navbar ul { justify-content: center; gap: 20px; }
-    .user-info { margin-top: 15px; }
-    .main-content { padding: 20px 10px; }
-    .container-central, .card-upload { padding: 20px; max-width: 100%; }
-    .page-header-with-arrow { flex-direction: column; align-items: flex-start; gap: 10px; margin-left: 10px; }
-    .candidate-details-header, .candidate-profile-section, .tabs-navigation, .filter-sort-area {
-        flex-direction: column; align-items: flex-start; gap: 15px; padding: 0 10px;
-    }
-    .candidate-actions-top { width: 100%; justify-content: flex-start; }
-
-    .tabs-navigation { overflow-x: auto; justify-content: flex-start; }
-    .tabs-navigation .tab-btn { flex-shrink: 0; }
-    .score-details-grid { grid-template-columns: 1fr; }
-    .form-row { flex-direction: column; gap: 0; }
-    .form-row .input-group { margin-bottom: 15px; }
-    .form-actions-bottom { flex-direction: column; align-items: stretch; }
-    .job-item, .job-title-status, .job-details { flex-direction: column; align-items: flex-start; }
-}
-
-/* Estilos para o container de habilidades no modal de vagas */
-.habilidades-container {
-    text-align: left;
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f7f8fa;
+/* --- Notificações Toast --- */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
     border-radius: 8px;
-    border: 1px solid #e0e6ed;
-}
-
-.habilidades-container label {
+    color: white;
     font-weight: 600;
-    color: var(--modern-text-medium);
-    display: block;
-    margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.tags-wrapper {
+.toast.toast-fade-out {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.toast-success { background-color: var(--modern-success-green); }
+.toast-error { background-color: var(--modern-danger-red); }
+
+
+/* --- Paginação --- */
+.pagination {
     display: flex;
-    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
     gap: 8px;
 }
 
-.skill-tag-editavel {
-    display: flex;
-    align-items: center;
+.page-link {
+    display: inline-block;
+    padding: 8px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #333;
+    background-color: #fff;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.page-link:hover {
+    background-color: #f0f4fa;
+    color: var(--modern-primary-blue);
+}
+
+.page-link.active {
     background-color: var(--modern-primary-blue);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-size: 0.9em;
-    font-weight: 500;
+    color: #fff;
+    border-color: var(--modern-primary-blue);
 }
 
-.skill-tag-editavel .remover-tag {
-    margin-left: 8px;
-    cursor: pointer;
+.page-dots {
+    color: #666;
     font-weight: bold;
-    font-size: 1.1em;
-    transition: transform 0.2s;
 }
 
-.skill-tag-editavel .remover-tag:hover {
-    transform: scale(1.2);
+
+/* ==========================================================================
+   5. Estilos Específicos das Páginas
+   ========================================================================== */
+
+/* --- Página de Login --- */
+.login-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--modern-background);
 }
 
-.spinner-inline {
-    margin-left: 8px;
+.card-login h2 {
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
 }
 
-/* Em style_moderno.css (adicionar no final) */
+.card-login .btn-primary {
+    width: 100%;
+    margin-top: 20px;
+}
 
-/* Estilos para o card de vaga melhorado */
+.links-login {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.links-login a {
+    color: var(--modern-primary-blue);
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+.links-login a:hover {
+    text-decoration: underline;
+}
+
+.icon-search-lg {
+    width: 80px;
+    height: 80px;
+    background-color: var(--modern-primary-blue);
+    border-radius: 50%;
+    margin: 0 auto 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+    color: var(--color-white);
+}
+
+/* --- Página da Dashboard --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
+    gap: 24px;
+    margin-top: 24px;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.kpi-card {
+    grid-column: span 1;
+    background: var(--modern-card-bg);
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    padding: 1.5rem;
+    transition: box-shadow 0.3s;
+    min-width: 220px;
+    text-align: center;
+}
+
+.kpi-card:hover {
+    box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+}
+
+.kpi-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.7rem;
+    color: var(--modern-text-medium);
+}
+
+.kpi-card .value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--modern-primary-blue);
+}
+
+.chart-card {
+    background: var(--modern-card-bg);
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    padding: 1.5rem;
+    transition: box-shadow 0.3s;
+}
+.chart-card:hover { box-shadow: 0 4px 32px rgba(0,0,0,0.15); }
+
+.chart-card-main {
+    grid-column: span 2;
+    grid-row: span 1;
+}
+
+.chart-card-side {
+    grid-column: span 1;
+    grid-row: span 1;
+}
+
+.insight-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.insight-list li {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.insight-list .count {
+    font-weight: 700;
+    color: var(--modern-primary-blue);
+    background-color: #e9f2ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+#topHabilidades {
+    font-size: 1.1rem;
+    margin: 0;
+    padding-left: 1.2em;
+    text-align: left;
+    list-style: decimal;
+}
+
+#topHabilidades li span {
+    color: var(--modern-primary-blue);
+    font-weight: bold;
+}
+
+/* --- Página de Vagas --- */
 .vaga-card-aprimorado {
     background: white;
     padding: 24px;
@@ -710,4 +711,922 @@ h2, h3, h4 {
     border-radius: 16px;
     font-size: 0.85em;
     font-weight: 600;
+}
+
+/* --- Página de Upload de Currículo --- */
+.card-upload .vaga-relacionada {
+    background-color: var(--modern-primary-blue);
+    color: var(--color-white);
+    padding: 8px 15px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 1em;
+}
+
+.drag-drop-area {
+    border: 2px dashed var(--modern-primary-blue);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 18px;
+    background-color: var(--modern-card-bg);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.drag-drop-area.highlight {
+    border-color: #005bb5;
+    background-color: #e0e8f0;
+}
+
+.icon-file {
+    font-size: 3em;
+    color: var(--modern-primary-blue);
+    margin-top: 12px;
+}
+
+.btn-select-file {
+    width: 80%;
+    padding: 15px;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+.file-types {
+    font-size: 0.9em;
+    color: var(--modern-text-medium);
+    margin-bottom: 25px;
+}
+
+.upload-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.upload-actions .btn {
+    flex: 1;
+    padding: 14px;
+    font-size: 1em;
+}
+
+/* --- Página de Processamento --- */
+.card-processing .spinner-icon {
+    font-size: 3.5rem;
+    color: var(--modern-primary-blue);
+    margin-bottom: 18px;
+}
+
+.progress-bar-container {
+    background: #eee;
+    border-radius: 8px;
+    height: 18px;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--modern-primary-blue) 0%, var(--modern-secondary-blue) 100%);
+    height: 100%;
+    border-radius: 8px;
+    width: 0%;
+    transition: width 0.5s ease-in-out;
+}
+
+/* --- Página de Detalhes do Candidato --- */
+.candidate-details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 0 20px;
+    flex-wrap: wrap;
+}
+
+.candidate-details-header h2 {
+    flex-grow: 1;
+    margin-bottom: 0;
+    font-size: 1.8rem;
+}
+
+.candidate-actions-top {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.candidate-actions-top .btn {
+    font-size: 0.85rem;
+    padding: 8px 15px;
+}
+
+.candidate-profile-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 30px;
+    background-color: var(--modern-card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    max-width: 900px;
+    margin: 30px auto;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    background-color: #e0e6ed;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4em;
+    color: #8898aa;
+}
+
+.profile-info {
+    flex-grow: 1;
+    line-height: 1.8;
+}
+
+.profile-info p {
+    margin-bottom: 5px;
+    font-size: 1em;
+    color: var(--modern-text-dark);
+}
+
+.profile-info p strong {
+    color: var(--modern-text-dark);
+    min-width: 120px;
+    display: inline-block;
+}
+
+.contact-icon {
+    margin-right: 8px;
+    color: var(--modern-primary-blue);
+}
+
+.profile-info a {
+    color: var(--modern-primary-blue);
+    text-decoration: none;
+}
+
+.profile-info a:hover {
+    text-decoration: underline;
+}
+
+/* Conteúdo das abas do candidato */
+.score-overall {
+    background: linear-gradient(45deg, var(--modern-primary-blue), var(--modern-secondary-blue));
+    color: var(--color-white);
+    padding: 18px 28px;
+    border-radius: 10px;
+    font-size: 1.6em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 4px 12px rgba(0,119,255,0.2);
+}
+
+.score-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.score-card {
+    background-color: #f0f4fa;
+    padding: 18px;
+    border-radius: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+}
+
+.score-card p {
+    font-size: 1em;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.score-value {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--modern-primary-blue);
+}
+
+.reasons-list {
+    list-style-type: disc;
+    margin-left: 25px;
+    color: #444;
+}
+
+.reasons-list li {
+    margin-bottom: 8px;
+    font-size: 1em;
+}
+
+.ai-analysis-panel {
+    background: #f0f4fa;
+    border-left: 6px solid var(--modern-primary-blue);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+}
+
+.ai-analysis-panel h3 {
+    margin-top: 0;
+    color: var(--modern-primary-blue);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: none;
+    padding-bottom: 0;
+    font-size: 1.4em;
+}
+
+.ai-analysis-panel h3 i {
+    font-size: 1.2em;
+}
+
+.ai-analysis-panel p {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #333;
+}
+
+.skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.skill-tag {
+    background-color: #e0e6ed;
+    color: #444;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.skill-tag:hover {
+    background-color: #c9d6e4;
+}
+
+.experience-item, .education-item {
+    background-color: #f9fafc;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+}
+
+.experience-item h4, .education-item h4 {
+    font-size: 1.15em;
+    margin-bottom: 5px;
+    color: #222;
+}
+
+.experience-item p, .education-item p {
+    font-size: 0.95em;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.experience-item ul {
+    list-style-type: disc;
+    margin-left: 25px;
+    color: #444;
+}
+
+.experience-item ul li {
+    margin-bottom: 5px;
+}
+
+.language-list {
+    list-style-type: disc;
+    margin-left: 25px;
+    color: #444;
+}
+
+.language-list li {
+    margin-bottom: 8px;
+    font-size: 1em;
+}
+
+.btn-download-cv {
+    display: block;
+    width: fit-content;
+    margin: 40px auto;
+    background-color: var(--modern-primary-blue);
+    color: var(--color-white);
+    padding: 15px 30px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,119,255,0.2);
+}
+
+.btn-download-cv:hover {
+    background-color: #005bb5;
+    box-shadow: 0 4px 16px rgba(0,119,255,0.3);
+}
+
+/* --- Página de Candidatos Ranqueados --- */
+.filter-sort-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto 30px auto;
+    padding: 0 20px;
+}
+
+.search-input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: #fff;
+    margin-right: 20px;
+    max-width: 350px;
+    color: #333;
+}
+
+.sort-by {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1em;
+    color: #555;
+}
+
+.sort-select {
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 1em;
+    cursor: pointer;
+    color: #333;
+}
+
+.candidate-list {
+    max-width: 900px;
+    margin: 0 auto 30px auto;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.candidate-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.candidate-item:last-child {
+    border-bottom: none;
+}
+
+.candidate-item:hover {
+    background-color: #f0f4fa;
+}
+
+.candidate-name {
+    font-weight: 600;
+    font-size: 1.1em;
+    flex-grow: 1;
+    color: #222;
+}
+
+.candidate-score {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: var(--modern-primary-blue);
+    margin-right: 30px;
+    min-width: 60px;
+    text-align: right;
+}
+
+.candidate-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.candidate-actions .btn-details {
+    background-color: var(--modern-primary-blue);
+    color: #fff;
+    padding: 8px 15px;
+    font-size: 0.9em;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.candidate-actions .btn-details:hover {
+    background-color: #005bb5;
+}
+
+.candidate-actions .btn-icon {
+    background-color: transparent;
+    border: none;
+    color: #666;
+    font-size: 1.3em;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.candidate-actions .btn-icon:hover {
+    color: #000;
+}
+
+.candidate-actions .btn-remove {
+    color: var(--modern-danger-red);
+}
+
+.candidate-actions .btn-remove:hover {
+    color: #c82333;
+}
+
+/* --- Container de Habilidades Editáveis (modal de vagas) --- */
+.habilidades-container {
+    text-align: left;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f7f8fa;
+    border-radius: 8px;
+    border: 1px solid #e0e6ed;
+}
+
+.habilidades-container label {
+    font-weight: 600;
+    color: var(--modern-text-medium);
+    display: block;
+    margin-bottom: 10px;
+}
+
+.tags-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-tag-editavel {
+    display: flex;
+    align-items: center;
+    background-color: var(--modern-primary-blue);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.skill-tag-editavel .remover-tag {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: transform 0.2s;
+}
+
+.skill-tag-editavel .remover-tag:hover {
+    transform: scale(1.2);
+}
+
+.spinner-inline {
+    margin-left: 8px;
+}
+
+
+/* ==========================================================================
+   6. Estilos Responsivos
+   ========================================================================== */
+
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .kpi-card, .chart-card-main, .chart-card-side {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Layout Geral */
+    .header {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px 20px;
+    }
+    .navbar {
+        margin-left: 0;
+        margin-top: 15px;
+    }
+    .navbar ul {
+        justify-content: center;
+        gap: 20px;
+    }
+    .user-info {
+        margin-top: 15px;
+    }
+    .main-content, .main-content.dashboard-page {
+        padding: 20px 10px;
+    }
+    .container-central, .card-upload {
+        padding: 20px;
+        max-width: 100%;
+    }
+    .page-header-with-arrow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-left: 10px;
+    }
+
+    /* Formulários */
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    .form-row .input-group {
+        margin-bottom: 15px;
+    }
+    .form-actions-bottom {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* Detalhes do Candidato */
+    .candidate-details-header, .candidate-profile-section, .filter-sort-area {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 0 10px;
+    }
+    .candidate-actions-top {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .tabs-navigation {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+    .tabs-navigation .tab-btn {
+        flex-shrink: 0;
+    }
+    .score-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Dashboard */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    .kpi-card, .chart-card-main, .chart-card-side {
+        grid-column: span 1;
+    }
+}
+
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+
+
+/* Estilo para o Novo Card de Vaga Moderno */
+.vaga-card-moderno {
+    background: var(--modern-card-bg);
+    border: 1px solid var(--modern-border-light);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    padding: 24px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.3s ease;
+}
+
+.vaga-card-moderno:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+}
+
+.vaga-card-moderno .vaga-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--modern-border-light);
+}
+
+.vaga-card-header h4 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--modern-text-dark);
+    margin: 0;
+}
+
+.vaga-card-header .vaga-data {
+    font-size: 0.85rem;
+    color: var(--modern-text-medium);
+    font-weight: 500;
+}
+
+.vaga-card-moderno .vaga-card-body {
+    padding: 16px 0;
+    color: var(--modern-text-medium);
+    line-height: 1.7;
+}
+
+.vaga-card-body .toggle-details-btn {
+    display: inline-block;
+    margin-top: 12px;
+    color: var(--modern-primary-blue);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.vaga-card-moderno .vaga-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    margin-top: auto; /* Empurra o rodapé para baixo */
+    border-top: 1px solid var(--modern-border-light);
+}
+
+.vaga-card-footer .vaga-habilidades-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1;
+}
+
+/* Refinamento Visual do Modal de Vagas */
+.modal-content {
+    background-color: #fdfdff; /* Fundo um pouco mais suave que branco puro */
+    border: 1px solid #eef;
+    padding: 32px 40px;
+}
+
+.modal-content h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--modern-text-dark);
+    margin-bottom: 32px;
+}
+
+.modal-content .input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.modal-content .input-group label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--modern-text-medium);
+}
+
+.modal-content #btnSugerirHabilidades {
+    width: 100%;
+    margin-bottom: 16px;
+    background: #6c757d; /* Cor secundária */
+}
+.modal-content #btnSugerirHabilidades:hover {
+    background: #5a6268;
+}
+
+.manual-skill-add {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.manual-skill-add input {
+    flex-grow: 1;
+}
+
+/* Refinamento Visual do Card de Vaga */
+.vaga-card-moderno .vaga-card-header h4 {
+    color: #333; /* Cor mais sóbria para o título */
+}
+
+.vaga-card-moderno .vaga-card-footer {
+    min-height: 40px; /* Garante alinhamento mesmo sem tags */
+}
+
+
+/* Estilo Aprimorado para o Modal de Vagas */
+.modal-content {
+    background-color: #fdfdff;
+    border: 1px solid #eef;
+    padding: 24px 32px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    max-width: 600px;
+}
+
+.modal-content h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-align: left;
+    color: var(--modern-text-dark);
+    margin-bottom: 24px;
+}
+
+.modal-content .input-group {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.modal-content .input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--modern-text-medium);
+}
+
+.modal-content .input-group input,
+.modal-content .input-group textarea {
+    font-size: 1rem;
+    padding: 12px;
+    border: 1px solid #ccc;
+}
+
+.modal-content .input-group input:focus,
+.modal-content .input-group textarea:focus {
+    border-color: var(--modern-primary-blue);
+    box-shadow: 0 0 0 3px rgba(0,119,255,0.1);
+    outline: none;
+}
+
+.habilidades-section {
+    text-align: left;
+    margin-top: 20px;
+    padding: 16px;
+    background-color: #f7f8fa;
+    border-radius: 8px;
+    border: 1px solid #e0e6ed;
+}
+
+.habilidades-section label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--modern-text-medium);
+    display: block;
+    margin-bottom: 12px;
+}
+
+#btnSugerirHabilidades {
+    background: #6c757d;
+    color: white;
+    width: 100%;
+    margin-bottom: 12px;
+}
+#btnSugerirHabilidades:hover {
+    background: #5a6268;
+}
+
+.tags-wrapper {
+    margin: 12px 0;
+    min-height: 30px;
+}
+
+.form-actions-bottom {
+    margin-top: 32px;
+    border-top: 1px solid var(--modern-border-light);
+    padding-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+
+/* Polimento Final dos Cards de Vaga */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--modern-border-light);
+}
+
+.page-header h2 {
+    margin: 0;
+}
+
+.vaga-card-moderno {
+    background: #FFFFFF;
+    border: 1px solid #E5E9F2;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    padding: 24px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.vaga-card-moderno:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.vaga-card-moderno .vaga-card-header {
+    padding-bottom: 0;
+    border-bottom: none;
+    margin-bottom: 16px;
+}
+
+.vaga-card-header h4 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a202c; /* Texto mais escuro e forte */
+}
+
+.vaga-card-header .vaga-data {
+    font-size: 0.9rem;
+    color: #718096; /* Cinza mais suave */
+    font-weight: 500;
+}
+
+.vaga-card-moderno .vaga-card-body {
+    padding: 0;
+    color: #4a5568; /* Cor de texto principal */
+    flex-grow: 1;
+}
+
+.vaga-card-moderno .vaga-card-footer {
+    padding-top: 24px;
+    margin-top: 24px;
+    border-top: 1px solid var(--modern-border-light);
+}
+
+
+/* Adiciona rolagem à seção de habilidades no modal de vaga */
+.modal-content .habilidades-section {
+    max-height: 300px; /* Ajuste esta altura conforme necessário */
+    overflow-y: auto; /* Adiciona a barra de rolagem vertical quando o conteúdo exceder a altura */
+    padding-right: 10px; /* Espaço para a barra de rolagem não cobrir o conteúdo */
+}
+
+.modal-content .tags-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px; /* Aumentei um pouco a margem inferior */
+}
+
+.modal-content .manual-skill-add {
+    margin-bottom: 15px; /* Aumentei um pouco a margem inferior */
+}
+
+/* Estilo para a barra de rolagem (opcional, mas melhora a aparência) */
+.modal-content .habilidades-section::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content .habilidades-section::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-content .habilidades-section::-webkit-scrollbar-thumb {
+    background-color: #c8c8c8;
+    border-radius: 4px;
+}
+
+.modal-content .habilidades-section::-webkit-scrollbar-thumb:hover {
+    background-color: #a8a8a8;
 }

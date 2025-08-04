@@ -1,7 +1,3 @@
-let nome = localStorage.getItem('user_nome');
-if (nome) {
-    document.getElementById('user-nome').textContent = `Olá, ${nome}!`;
-}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,83 +6,64 @@ if (nome) {
     <title>APB Vision - Candidatos Ranqueados</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style_moderno.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
-    <!-- Dados dos candidatos disponíveis via atributo data-candidates no body -->
-</head>
-<body class="navbar-layout">
+    
     <script>
         window.FLASK_CANDIDATES_DATA = {{ (candidatos or []) | tojson | safe }};
     </script>
+</head>
+<body class="navbar-layout">
     <div class="header">
         <div class="logo">
-            <img src="{{ url_for('static', filename='img/logo_apb_vision.png') }}" alt="Logo APB Vision" style="height:48px;vertical-align:middle;margin-right:12px;background:transparent;">
-            <span>APB <span class="logo-vision">Vision</span></span>
+            <img src="{{ url_for('static', filename='img/logo_apb_vision.png') }}" alt="Logo APB Vision">
+            <span>APB Vision</span>
         </div>
         <nav class="navbar">
             <ul>
-                <li><a href="/home">Home</a></li>
-                <li><a href="/vagas">Vagas</a></li>
-                <li><a href="/candidatos_ranqueados" class="active">Candidatos</a></li>
+                <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                <li><a href="{{ url_for('vagas') }}">Vagas</a></li>
+                <li><a href="{{ url_for('candidatos_ranqueados') }}" class="active">Candidatos</a></li>
                 <li><a href="#">Configurações</a></li>
             </ul>
         </nav>
         <div class="user-info">
             <img src="{{ url_for('static', filename='images/user_profile.jpg') }}" alt="Foto de perfil">
-            <span>Olá, Ana!</span>
+            <span id="user-nome">Olá, Usuário!</span>
         </div>
     </div>
 
-    <div class="main-content content-wrapper">
+    <div class="main-content">
         <div class="page-header-with-arrow">
-            <a href="/upload_curriculos" class="back-arrow"><i class="fas fa-arrow-left"></i></a>
-            <h2>Candidatos Ranqueados para Analista de Dados</h2>
+            <a href="{{ url_for('upload_curriculos_page') }}" class="back-arrow"><i class="fas fa-arrow-left"></i></a>
+            <h2>Candidatos Ranqueados</h2>
         </div>
 
         <div class="filter-sort-area">
-    <div class="vaga-selector">
-        <span>Analisando candidatos para a vaga:</span>
-        <select id="vagaSelector" class="sort-select">
-            <option value="geral">Visão Geral (Pontuação Geral)</option>
-            {% for vaga in vagas %}
-                <option value="{{ vaga.id }}">{{ vaga.nome }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <input type="text" id="searchCandidate" placeholder="Buscar candidato..." class="search-input">
-    <div class="sort-by">
-        <span>Ordenar por:</span>
-        <select id="sortOrder" class="sort-select">
-            <option value="pontuacao_desc">Pontuação (Maior p/ Menor)</option>
-            </select>
-    </div>
-</div>
+            <div class="vaga-selector">
+                <span>Analisando para a vaga:</span>
+                <select id="vagaSelector" class="sort-select">
+                    <option value="geral">Visão Geral (Pontuação Geral)</option>
+                    {% for vaga in vagas %}
+                        <option value="{{ vaga.id }}">{{ vaga.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="text" id="searchCandidate" placeholder="Buscar candidato..." class="search-input">
+        </div>
 
         <div class="candidate-list" id="candidateList">
-            <!-- Os candidatos serão renderizados dinamicamente via JS -->
-        </div>
-
-        <div class="pagination">
-            <a href="#" class="page-link prev-page"><i class="fas fa-angle-left"></i></a>
-            <a href="#" class="page-link active">1</a>
-            <a href="#" class="page-link">2</a>
-            <a href="#" class="page-link">3</a>
-            <span class="page-dots">...</span>
-            <a href="#" class="page-link next-page"><i class="fas fa-angle-right"></i></a>
-        </div>
+            </div>
     </div>
 
     <div id="candidateOptionsModal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h3>Opções para <span id="modalCandidateName"></span></h3>
-            <button class="btn btn-primary modal-option-btn" id="btnReproveCandidate">Reprovar Candidato</button>
+            <button class="btn modal-option-btn" id="btnReproveCandidate">Reprovar Candidato</button>
             <button class="btn btn-danger modal-option-btn" id="btnDeleteCandidate">Excluir Candidato</button>
             <button class="btn btn-secondary modal-option-btn" id="btnCancelOption">Cancelar</button>
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
 </body>
 </html>

@@ -3,53 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APB Vision - Enviar Currículos</title>
+    <title>Enviar Currículos | APB Vision</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style_moderno.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="navbar-layout">
+<body>
     <div class="header">
-        <div class="logo">
-            <img src="{{ url_for('static', filename='img/logo_apb_vision.png') }}" alt="Logo APB Vision" style="height:48px;vertical-align:middle;margin-right:12px;background:transparent;">
-            <span>APB <span class="logo-vision">Vision</span></span>
-        </div>
+        <div class="logo"><span>APB Vision</span></div>
         <nav class="navbar">
             <ul>
-                <li><a href="/home">Home</a></li>
+                <li><a href="/home">Inicio</a></li>
                 <li><a href="/vagas">Vagas</a></li>
                 <li><a href="/candidatos_ranqueados">Candidatos</a></li>
-                <li><a href="#">Configurações</a></li>
             </ul>
         </nav>
-        <div class="user-info">
-            <img src="{{ url_for('static', filename='images/user_profile.jpg') }}" alt="Foto de perfil">
-            <span id="user-nome">Olá, Usuário!</span> </div>
+        <div class="user-info"><span id="user-nome"></span></div>
     </div>
-
-    <div class="main-content content-wrapper">
-        <a href="/home" class="back-arrow"><i class="fas fa-arrow-left"></i></a>
+    <div class="main-content">
         <h2>Enviar Currículos para Análise</h2>
-
         <div class="container-central">
-            <div class="card-upload">
-                <div class="icon-search-circle"></div>
-                <p class="vaga-relacionada">Vaga Relacionada: Analista de Dados</p>
-                <div class="drag-drop-area" id="dragDropArea">
-                    <p id="arquivosSelecionados">Arraste e solte os arquivos aqui</p>
-                    <i class="fas fa-file-alt icon-file"></i>
+            <form id="uploadForm" action="{{ url_for('upload_multiple_files') }}" method="POST" enctype="multipart/form-data">
+                <div class="card-upload">
+                    <div class="drag-drop-area" id="dragDropArea">
+                        <p id="arquivosSelecionados">Arraste e solte os arquivos aqui</p>
+                        <i class="fas fa-file-alt icon-file"></i>
+                    </div>
+                    <input type="file" id="arquivo" name="arquivos[]" multiple accept=".pdf,.docx" style="display: none;">
+                    <button type="button" class="btn btn-primary" id="btnSelecionarArquivos">Selecionar Arquivos</button>
+                    <div class="upload-actions">
+                        <a href="{{ url_for('home') }}" class="btn btn-secondary">Voltar</a>
+                        <button type="submit" class="btn btn-primary" id="btnIniciarTriagemUpload">Iniciar Triagem</button>
+                    </div>
                 </div>
-                <input type="file" id="arquivo" name="files" multiple accept=".pdf,.docx" style="display: none;">
-                <button class="btn btn-primary btn-select-file" id="btnSelecionarArquivos">Selecionar Arquivos</button>
-                <p class="file-types">Tipos de arquivos aceitos: **PDF**, **DOCX**</p>
-
-                <div class="upload-actions">
-                    <button class="btn btn-secondary" id="btnVoltarUpload">Voltar</button>
-                    <button class="btn btn-primary" id="btnIniciarTriagemUpload">Iniciar Triagem</button>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
-    
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
