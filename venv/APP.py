@@ -184,40 +184,44 @@ def candidatos_ranqueados():
             return jsonify({"error": "Vaga não encontrada"}), 404
 
         habilidades_vaga_raw = json.loads(vaga['habilidades_chave'] or '[]')
-        
-        # Normaliza as habilidades da vaga: minúsculas e sem espaços extras
         habilidades_vaga = {skill.strip().lower() for skill in habilidades_vaga_raw if skill.strip()}
 
         if not habilidades_vaga:
-            # Retorna a lista com match 0 se a vaga não tiver habilidades
-            return jsonify([dict(c, match_score=0) for c in candidatos])
+            return jsonify([dict(c, indice_adequacao=0, nivel="Requer Análise") for c in candidatos])
 
-        candidatos_com_match = []
+        candidatos_classificados = []
         for candidato in candidatos:
             candidato_dict = dict(candidato)
-            habilidades_candidato_raw = json.loads(candidato_dict.get('habilidades', '[]'))
             
-            # Normaliza as habilidades do candidato
+            # --- LÓGICA DE CÁLCULO (permanece a mesma) ---
+            habilidades_candidato_raw = json.loads(candidato_dict.get('habilidades', '[]') or '[]')
             habilidades_candidato = {skill.strip().lower() for skill in habilidades_candidato_raw if skill.strip()}
+            habilidades_em_comum_count = sum(1 for hv in habilidades_vaga if any(hv in hc for hc in habilidades_candidato))
+            score_habilidades = (habilidades_em_comum_count / len(habilidades_vaga)) * 100 if habilidades_vaga else 0
             
-            habilidades_em_comum_count = 0
+            tem_experiencia = json.loads(candidato_dict.get('experiencia', '[]') or '[]')
+            score_experiencia = 100 if tem_experiencia else 0
             
-            # --- INÍCIO DA NOVA LÓGICA DE COMPARAÇÃO FLEXÍVEL ---
-            for hv in habilidades_vaga:
-                # Verifica se a habilidade da vaga (hv) tem correspondência em alguma das habilidades do candidato (hc)
-                # O 'in' permite correspondência parcial. Ex: "windows" em "windows server"
-                if any(hv in hc for hc in habilidades_candidato):
-                    habilidades_em_comum_count += 1
-            # --- FIM DA NOVA LÓGICA ---
+            tem_formacao = json.loads(candidato_dict.get('formacao', '[]') or '[]')
+            score_formacao = 100 if tem_formacao else 0
             
-            match_score = 0
-            if habilidades_vaga: # Evita divisão por zero
-                match_score = round((habilidades_em_comum_count / len(habilidades_vaga)) * 100)
-            
-            candidato_dict['match_score'] = match_score
-            candidatos_com_match.append(candidato_dict)
+            pesos = {'habilidades': 0.60, 'experiencia': 0.25, 'formacao': 0.15}
+            indice_final = round((score_habilidades * pesos['habilidades']) + (score_experiencia * pesos['experiencia']) + (score_formacao * pesos['formacao']))
 
-        candidatos_ordenados = sorted(candidatos_com_match, key=lambda c: c['match_score'], reverse=True)
+            # --- NOVA LÓGICA DE CLASSIFICAÇÃO POR NÍVEL ---
+            nivel = ""
+            if indice_final > 70:
+                nivel = "Excelente"
+            elif indice_final > 40:
+                nivel = "Promissor"
+            else:
+                nivel = "Requer Análise"
+
+            candidato_dict['indice_adequacao'] = indice_final
+            candidato_dict['nivel'] = nivel # Adiciona o nível ao resultado
+            candidatos_classificados.append(candidato_dict)
+            
+        candidatos_ordenados = sorted(candidatos_classificados, key=lambda c: c['indice_adequacao'], reverse=True)
         return jsonify(candidatos_ordenados)
     
     # Se for a primeira vez que carrega a página

@@ -386,33 +386,74 @@ if (candidateListContainer) {
     let currentCandidateId = null;
 
     // Função para renderizar a lista de candidatos na tela
-    function renderCandidates(candidates) {
-        candidateListContainer.innerHTML = '';
-        if (!candidates || candidates.length === 0) {
-            candidateListContainer.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum candidato encontrado.</p>';
-            return;
+function renderCandidates(candidates) {
+    candidateListContainer.innerHTML = '';
+    if (!candidates || candidates.length === 0) {
+        candidateListContainer.innerHTML = '<p class="empty-list-message">Nenhum candidato encontrado.</p>';
+        return;
+    }
+
+    candidates.forEach((c, index) => {
+        const item = document.createElement('div');
+        item.className = 'candidate-item'; // Classe base para cada linha
+
+        // Variáveis para guardar o HTML do Ranking e da Avaliação
+        let rankHTML = '';
+        let tierHTML = '';
+        
+        // --- Lógica para a Avaliação (Excelente, Promissor, etc.) ---
+        if (c.nivel) {
+            let tierClass = '';
+            let tierIcon = '';
+            if (c.nivel === 'Excelente') {
+                tierClass = 'tier-excelente';
+                tierIcon = '<i class="fas fa-star"></i>';
+            } else if (c.nivel === 'Promissor') {
+                tierClass = 'tier-promissor';
+                tierIcon = '<i class="fas fa-thumbs-up"></i>';
+            } else {
+                tierClass = 'tier-analise';
+                tierIcon = '<i class="fas fa-eye"></i>';
+            }
+            // Cria a etiqueta de avaliação
+            tierHTML = `<div class="candidate-tier ${tierClass}">${tierIcon} ${c.nivel}</div>`;
+        } else {
+            // Se não tiver um nível (visão geral), mostra a pontuação
+            tierHTML = `<span class="candidate-score">${c.pontuacao}% Geral</span>`;
         }
 
-        candidates.forEach(c => {
-            const score = c.match_score !== undefined ? c.match_score : c.pontuacao;
-            const scoreLabel = c.match_score !== undefined ? '% Match' : '% Geral';
+        // --- Lógica para o Ranking (Pódio/Corrida) ---
+        if (c.indice_adequacao !== undefined) { // Só mostra o pódio se for uma análise de vaga
+            if (index === 0) {
+                item.classList.add('podium-gold');
+                rankHTML = '<span class="candidate-rank"><i class="fas fa-medal"></i></span>';
+            } else if (index === 1) {
+                item.classList.add('podium-silver');
+                rankHTML = '<span class="candidate-rank"><i class="fas fa-medal"></i></span>';
+            } else if (index === 2) {
+                item.classList.add('podium-bronze');
+                rankHTML = '<span class="candidate-rank"><i class="fas fa-medal"></i></span>';
+            } else {
+                rankHTML = `<span class="candidate-rank">${index + 1}º</span>`;
+            }
+        }
 
-            const item = document.createElement('div');
-            item.className = 'candidate-item';
-            item.id = `candidato-item-${c.id}`; // Adiciona um ID para fácil remoção
-            item.innerHTML = `
-                <span class="candidate-name">${c.nome}</span>
-                <span class="candidate-score">${score}${scoreLabel}</span>
-                <div class="candidate-actions">
-                    <a href="/detalhes_candidato/${c.id}" class="btn btn-details">Ver detalhes</a>
-                    <button class="btn-icon btn-options" data-id="${c.id}" data-name="${c.nome}" title="Mais opções">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
-                </div>
-            `;
-            candidateListContainer.appendChild(item);
-        });
-    }
+        // Monta o HTML final da linha do candidato
+        item.id = `candidato-item-${c.id}`;
+        item.innerHTML = `
+            ${rankHTML}
+            <span class="candidate-name">${c.nome}</span>
+            ${tierHTML}
+            <div class="candidate-actions">
+                <a href="/detalhes_candidato/${c.id}" class="btn btn-details">Ver detalhes</a>
+                <button class="btn-icon btn-options" data-id="${c.id}" data-name="${c.nome}" title="Mais opções">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+        `;
+        candidateListContainer.appendChild(item);
+    });
+}
 
     // Função para abrir o modal de opções
     function openOptionsModal(id, name) {

@@ -1630,3 +1630,144 @@ h2, h3, h4 {
 .modal-content .habilidades-section::-webkit-scrollbar-thumb:hover {
     background-color: #a8a8a8;
 }
+/* EM: static/css/style_moderno.css (adicionar no final) */
+
+/* Estilo do Pódio para a Lista de Candidatos */
+.candidate-item {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Espaço entre os elementos */
+    border-left: 5px solid transparent; /* Borda base para o efeito */
+    transition: all 0.2s ease;
+}
+
+.candidate-rank {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--modern-text-medium);
+    width: 40px; /* Largura fixa para alinhamento */
+    text-align: center;
+}
+
+/* Estilos para cada posição do pódio */
+.candidate-item.podium-gold {
+    border-left-color: #FFD700; /* Ouro */
+    background-color: #fffbeb;
+}
+.podium-gold .candidate-rank i.fa-medal {
+    color: #FFD700;
+    font-size: 1.5rem;
+}
+
+.candidate-item.podium-silver {
+    border-left-color: #C0C0C0; /* Prata */
+    background-color: #f8f9fa;
+}
+.podium-silver .candidate-rank i.fa-medal {
+    color: #C0C0C0;
+    font-size: 1.5rem;
+}
+
+.candidate-item.podium-bronze {
+    border-left-color: #CD7F32; /* Bronze */
+    background-color: #fbf5ef;
+}
+.podium-bronze .candidate-rank i.fa-medal {
+    color: #CD7F32;
+    font-size: 1.5rem;
+}
+/* EM: static/css/style_moderno.css (adicionar no final) */
+
+/* Estilo para os Níveis de Compatibilidade */
+.candidate-rank-new {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--modern-text-medium);
+    width: 30px;
+    text-align: right;
+}
+
+.candidate-tier {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+}
+
+.candidate-tier.tier-excelente {
+    background-color: #28a745; /* Verde */
+}
+
+.candidate-tier.tier-promissor {
+    background-color: var(--modern-primary-blue); /* Azul */
+}
+
+.candidate-tier.tier-analise {
+    background-color: #6c757d; /* Cinza */
+}
+/* COLE ESTE BLOCO NO FINAL DO SEU ARQUIVO style_moderno.css */
+
+/* Estilo Combinado do Pódio e Níveis de Compatibilidade */
+.candidate-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    border-left: 6px solid transparent; /* Borda base para o efeito de pódio */
+}
+
+.candidate-rank {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--modern-text-medium);
+    width: 40px;
+    text-align: center;
+}
+
+.candidate-rank i.fa-medal {
+    font-size: 1.6rem;
+}
+
+.candidate-name {
+    flex-grow: 1; /* Faz o nome ocupar o espaço restante */
+    font-weight: 600;
+    color: var(--modern-text-dark);
+}
+
+.candidate-tier {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    white-space: nowrap; /* Impede que o texto quebre */
+}
+
+.candidate-tier.tier-excelente { background-color: #28a745; }
+.candidate-tier.tier-promissor { background-color: var(--modern-primary-blue); }
+.candidate-tier.tier-analise { background-color: #6c757d; }
+
+.candidate-item.podium-gold {
+    background-color: #fffbeb;
+    border-left-color: #FFD700; /* Ouro */
+}
+.podium-gold .candidate-rank i.fa-medal { color: #FFD700; }
+
+.candidate-item.podium-silver {
+    background-color: #f8f9fa;
+    border-left-color: #C0C0C0; /* Prata */
+}
+.podium-silver .candidate-rank i.fa-medal { color: #C0C0C0; }
+
+.candidate-item.podium-bronze {
+    background-color: #fbf5ef;
+    border-left-color: #CD7F32; /* Bronze */
+}
+.podium-bronze .candidate-rank i.fa-medal { color: #CD7F32; }
