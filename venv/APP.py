@@ -164,17 +164,12 @@ def processing_page(): return render_template('processing.html')
 
 @app.route('/candidatos_ranqueados')
 def candidatos_ranqueados():
-    """
-    Renderiza a página de candidatos e também serve como API para calcular o "match"
-    de forma robusta (ignorando maiúsculas/minúsculas e espaços).
-    """
     vaga_id_selecionada = request.args.get('vaga_id', default=None, type=int)
     
     db_candidatos = get_db()
     candidatos = db_candidatos.execute("SELECT * FROM candidatos WHERE status = 'ativo'").fetchall()
     db_candidatos.close()
 
-  # Se a requisição for para a API (feita pelo JavaScript para calcular o match)
     if vaga_id_selecionada:
         db_vagas = get_db(VAGAS_DB)
         vaga = db_vagas.execute("SELECT habilidades_chave FROM vagas WHERE id = ?", (vaga_id_selecionada,)).fetchone()
@@ -193,62 +188,89 @@ def candidatos_ranqueados():
         for candidato in candidatos:
             candidato_dict = dict(candidato)
             
-            # --- LÓGICA DE CÁLCULO (permanece a mesma) ---
-            habilidades_candidato_raw = json.loads(candidato_dict.get('habilidades', '[]') or '[]')
-            habilidades_candidato = {skill.strip().lower() for skill in habilidades_candidato_raw if skill.strip()}
+            # --- INÍCIO DA LÓGICA DE NORMALIZAÇÃO DE DADOS ---
+            def normalizar_campo(valor_campo):
+                if not valor_campo:
+                    return []
+                try:
+                    # Tenta carregar como JSON (estrutura ideal)
+                    dados = json.loads(valor_campo)
+                    return dados if isinstance(dados, list) else [dados]
+                except (json.JSONDecodeError, TypeError):
+                    # Se falhar, trata como string separada por vírgula
+                    return [item.strip() for item in valor_campo.split(',')]
+
+            habilidades_candidato_raw = normalizar_campo(candidato_dict.get('habilidades'))
+            tem_experiencia = normalizar_campo(candidato_dict.get('experiencia'))
+            tem_formacao = normalizar_campo(candidato_dict.get('formacao'))
+            # --- FIM DA LÓGICA DE NORMALIZAÇÃO ---
+
+            habilidades_candidato = {str(skill).strip().lower() for skill in habilidades_candidato_raw}
             habilidades_em_comum_count = sum(1 for hv in habilidades_vaga if any(hv in hc for hc in habilidades_candidato))
             score_habilidades = (habilidades_em_comum_count / len(habilidades_vaga)) * 100 if habilidades_vaga else 0
             
-            tem_experiencia = json.loads(candidato_dict.get('experiencia', '[]') or '[]')
             score_experiencia = 100 if tem_experiencia else 0
-            
-            tem_formacao = json.loads(candidato_dict.get('formacao', '[]') or '[]')
             score_formacao = 100 if tem_formacao else 0
             
             pesos = {'habilidades': 0.60, 'experiencia': 0.25, 'formacao': 0.15}
             indice_final = round((score_habilidades * pesos['habilidades']) + (score_experiencia * pesos['experiencia']) + (score_formacao * pesos['formacao']))
 
-            # --- NOVA LÓGICA DE CLASSIFICAÇÃO POR NÍVEL ---
-            nivel = ""
+            nivel = "Requer Análise"
             if indice_final > 70:
                 nivel = "Excelente"
             elif indice_final > 40:
                 nivel = "Promissor"
-            else:
-                nivel = "Requer Análise"
 
             candidato_dict['indice_adequacao'] = indice_final
-            candidato_dict['nivel'] = nivel # Adiciona o nível ao resultado
+            candidato_dict['nivel'] = nivel
             candidatos_classificados.append(candidato_dict)
             
         candidatos_ordenados = sorted(candidatos_classificados, key=lambda c: c['indice_adequacao'], reverse=True)
         return jsonify(candidatos_ordenados)
-    
-    # Se for a primeira vez que carrega a página
-    else:
+
+    else: # Carregamento inicial da página
         db_vagas = get_db(VAGAS_DB)
         vagas_db = db_vagas.execute("SELECT id, nome FROM vagas ORDER BY nome").fetchall()
         db_vagas.close()
         
-        # --- LINHA DA CORREÇÃO ---
-        # Converte a lista de objetos 'Row' de vagas para uma lista de dicionários
         vagas_serializaveis = [dict(v) for v in vagas_db]
-        
         candidatos_ordenados = sorted([dict(c) for c in candidatos], key=lambda c: c.get('pontuacao', 0), reverse=True)
 
         return render_template('candidatos_ranqueados.html', candidatos=candidatos_ordenados, vagas=vagas_serializaveis)
-
 
 @app.route('/detalhes_candidato/<int:candidate_id>')
 def detalhes_candidato(candidate_id):
     db = get_db()
     candidato = db.execute("SELECT * FROM candidatos WHERE id = ?", (candidate_id,)).fetchone()
     db.close()
-    if not candidato: return redirect(url_for('candidatos_ranqueados'))
+    if not candidato:
+        return redirect(url_for('candidatos_ranqueados'))
     
     candidato_dict = dict(candidato)
+    
+    # Itera sobre os campos que deveriam ser JSON
     for key in ['habilidades', 'formacao', 'experiencia', 'motivos_pontuacao', 'idiomas']:
-        candidato_dict[key] = json.loads(candidato_dict.get(key) or '[]')
+        valor = candidato_dict.get(key)
+        if not valor:
+            candidato_dict[key] = []
+            continue
+        try:
+            # Tenta carregar como JSON
+            dados = json.loads(valor)
+            # Garante que seja sempre uma lista
+            candidato_dict[key] = dados if isinstance(dados, list) else [dados]
+        except (json.JSONDecodeError, TypeError):
+            # Se falhar, trata como string simples
+            # Para habilidades/idiomas, cria uma lista. Para outros, um objeto genérico.
+            if key in ['habilidades', 'idiomas', 'motivos_pontuacao']:
+                 candidato_dict[key] = [item.strip() for item in valor.split(',')]
+            elif key == 'formacao':
+                candidato_dict[key] = [{'curso': valor, 'instituicao': 'N/A', 'periodo': 'N/A'}]
+            elif key == 'experiencia':
+                 candidato_dict[key] = [{'cargo': 'Experiência Geral', 'empresa': 'N/A', 'periodo': 'N/A', 'atividades': [valor]}]
+            else:
+                 candidato_dict[key] = [valor]
+
     return render_template('candidate_details.html', candidate=candidato_dict)
 
 # --- Rota de Upload (Síncrona e Funcional) ---
@@ -322,7 +344,7 @@ def upload_multiple_files():
 # --- ROTAS DE API (LOGIN, DASHBOARD, ETC.) ---
 @app.route('/api/login', methods=['POST'])
 def api_login():
-    USERS = [{'email': 'arthur@gmail.com', 'senha': 'arthur123', 'nome': 'Arthur Carvalho'}]
+    USERS = [{'email': 'apbvision@email.com', 'senha': '123', 'nome': 'Arthur Carvalho'}]
     data = request.get_json()
     for user in USERS:
         if user['email'] == data.get('email') and user['senha'] == data.get('senha'):
@@ -332,17 +354,15 @@ def api_login():
 # Adicionar outras APIs como a de Vagas e Dashboard aqui no futuro
 @app.route('/dashboard_data')
 def dashboard_data():
-    """
-    API para fornecer dados agregados para a dashboard.
-    """
     try:
         db = get_db()
-        candidatos = db.execute("SELECT pontuacao, habilidades, formacao FROM candidatos WHERE status = 'ativo'").fetchall()
+        candidatos = db.execute("SELECT pontuacao, habilidades, experiencia, formacao, idiomas FROM candidatos WHERE status = 'ativo'").fetchall()
         db.close()
 
         if not candidatos:
             return jsonify({
-                'total_candidatos': 0, 'media_pontuacao': 0, 'habilidades_mais_comuns': {}, 'distribuicao_pontuacoes': {}, 'formacoes_mais_comuns': {}
+                'total_candidatos': 0, 'media_pontuacao': 0, 'habilidades_mais_comuns': {}, 
+                'distribuicao_pontuacoes': {}, 'formacoes_mais_comuns': {}
             })
 
         total_candidatos = len(candidatos)
@@ -354,19 +374,31 @@ def dashboard_data():
 
         for candidato in candidatos:
             try:
-                contador_habilidades.update(json.loads(candidato['habilidades'] or '[]'))
-                formacoes = [f.get('curso', 'N/A') for f in json.loads(candidato['formacao'] or '[]')]
-                contador_formacoes.update(formacoes)
-            except (json.JSONDecodeError, TypeError):
-                continue
+                # Normaliza habilidades: tenta JSON, se falhar, trata como string
+                habilidades_raw = candidato['habilidades'] or '[]'
+                try:
+                    lista_habilidades = json.loads(habilidades_raw)
+                except (json.JSONDecodeError, TypeError):
+                    lista_habilidades = [h.strip() for h in habilidades_raw.split(',')]
+                contador_habilidades.update(lista_habilidades)
 
-        # Distribuição de Pontuações (agrupando em faixas)
-        faixas_pontuacao = [0] * 10  # 10 faixas de 10 pontos (0-9, 10-19, ..., 90-99)
+                # Normaliza formação: tenta JSON, se falhar, trata como string
+                formacao_raw = candidato['formacao'] or '[]'
+                try:
+                    lista_formacao_obj = json.loads(formacao_raw)
+                    formacoes = [f.get('curso', 'N/A') for f in lista_formacao_obj]
+                except (json.JSONDecodeError, TypeError):
+                    formacoes = [f.strip() for f in formacao_raw.split(',')]
+                contador_formacoes.update(formacoes)
+
+            except Exception:
+                continue # Pula para o próximo candidato em caso de erro inesperado
+
+        faixas_pontuacao = [0] * 10
         for pontuacao in pontuacoes:
             if 0 <= pontuacao <= 99:
                 indice = pontuacao // 10
-                faixas_pontuacao [indice] += 1
-
+                faixas_pontuacao[indice] += 1
         labels_pontuacao = [f'{i*10}-{i*10 + 9}' for i in range(10)]
         distribuicao_pontuacoes = dict(zip(labels_pontuacao, faixas_pontuacao))
 
